@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إيفنت برو V7 - المصمم التفاعلي</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Reem+Kufi:wght@400;700&family=Lateef&family=Changa:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #d4af37;
+            --bg-dark: #0a0a0a;
+            --panel-bg: #1a1a1a;
+            --border: #333;
+            
+            /* -- لوحة الألوان الجديدة والمدموجة -- */
+            --g1: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); /* ذهبي ملكي */
+            --g2: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); /* بنفسجي سماوي */
+            --g3: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* فوشيا ناري */
+            --g4: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); /* نعناعي بنفسجي */
+            --g5: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); /* وردي باستيل */
+            --g6: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); /* أخضر ليموني */
+            --g7: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); /* مرجاني هادئ */
+            --g8: linear-gradient(45deg, #2c3e50, #3498db); /* أزرق محيطي */
+            --g9: linear-gradient(45deg, #870000, #190a05); /* أحمر غامق */
+            --g10: linear-gradient(45deg, #e0e0e0, #ffffff, #9e9e9e, #bdbdbd); /* فضي لامع */
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Cairo', sans-serif; user-select: none; }
+
+        .app-container { display: flex; flex-direction: column; gap: 20px; max-width: 1400px; margin: 0 auto; padding: 20px; min-height: 100vh; }
+        .preview-section { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
+        .controls-section { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+
+        #captureArea { width: 100%; max-width: 450px; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .main-card { width: 100%; aspect-ratio: 1/1.414; background-size: cover; background-position: center; position: relative; }
+
+        /* --- تعديلات لجعل النصوص قابلة للحركة --- */
+        .content { position: relative; width: 100%; height: 100%; z-index: 2; overflow: hidden; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
+        
+        .editable-text {
+            position: absolute;
+            transition: 0.2s ease-out;
+            cursor: grab; /* تغيير المؤشر */
+            display: inline-block;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            white-space: nowrap; /* لمنع التفاف النص أثناء السحب */
+        }
+        .editable-text.dragging {
+            cursor: grabbing;
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .editable-text.active-target { border-color: var(--primary); background: rgba(212, 175, 55, 0.1); }
+
+        /* مواضع أولية للنصوص */
+        #outIntro { top: 15%; left: 50%; transform: translateX(-50%); font-family: 'Aref Ruqaa'; font-size: 1.5rem; text-align: center; }
+        #outNames { top: 35%; left: 50%; transform: translateX(-50%); font-family: 'Amiri'; font-size: 3.5rem; font-weight: 700; line-height: 1.2; text-align: center; }
+        #outDate  { top: 65%; left: 50%; transform: translateX(-50%); font-family: 'Cairo'; font-size: 1.1rem; text-align: center; }
+        #outLoc   { top: 75%; left: 50%; transform: translateX(-50%); font-family: 'Cairo'; font-size: 1.1rem; text-align: center; }
+        #outInv   { top: 88%; left: 50%; transform: translateX(-50%); font-family: 'Reem Kufi'; font-size: 1rem; color: var(--primary); text-align: center; }
+
+        .loc-pin { display: inline-flex; align-items: center; gap: 5px; color: inherit; text-decoration: none; }
+
+        .panel { background: var(--panel-bg); border-radius: 15px; padding: 20px; border: 1px solid var(--border); }
+        .label-s { font-size: 0.9rem; color: var(--primary); margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+
+        .target-selector { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 5px; padding-bottom: 10px; }
+        .target-btn { background: #333; color: #aaa; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 13px; }
+        .target-btn.active { background: var(--primary); color: #000; font-weight: bold; }
+
+        .responsive-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); }
+        .color-circle { aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 2px solid #444; transition: 0.2s; }
+        .color-circle.active { border-color: #fff; transform: scale(1.15); }
+
+        .font-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .font-opt { background: #252525; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; cursor: pointer; border: 1px solid #444; }
+        .font-opt.active { border-color: var(--primary); color: var(--primary); }
+
+        .input-box { width: 100%; background: #252525; border: 1px solid #444; padding: 14px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
+        .input-box:focus { border-color: var(--primary); }
+
+        /* --- تصميم قسم رفع الخلفية --- */
+        .bg-controls { display: flex; flex-direction: column; gap: 15px; }
+        .bg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
+        .bg-thumb { aspect-ratio: 3/4; border-radius: 6px; background-size: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.7; transition: 0.2s; }
+        .bg-thumb:hover { opacity: 1; }
+        .bg-thumb.active { border-color: var(--primary); opacity: 1; transform: scale(1.05); }
+
+        .upload-btn {
+            background: #333; padding: 12px; border-radius: 10px; text-align: center;
+            cursor: pointer; font-size: 0.9rem; transition: background 0.3s;
+        }
+        .upload-btn:hover { background: #444; }
+        #bgUpload { display: none; } /* إخفاء حقل الرفع الأصلي */
+
+        .save-btn { width: 100%; background: var(--g1); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
+        
+        @media (min-width: 992px) {
+            .app-container { flex-direction: row; align-items: flex-start; }
+            .preview-section { position: sticky; top: 20px; height: calc(100vh - 40px); align-items: center; }
+            .controls-section { flex: 1.2; max-width: 600px; }
+        }
+        @media (max-width: 599px) {
+            .app-container { padding: 10px; gap: 15px; }
+            .panel { padding: 15px; }
+            #outNames { font-size: 2.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div class="preview-section">
+        <div id="captureArea">
+            <div id="card" class="main-card" style="background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800')">
+                <div class="overlay"></div>
+                <div class="content">
+                    <span id="outIntro" class="editable-text">نتشرف بدعوتكم لحضور حفل</span>
+                    <span id="outNames" class="editable-text">فارس & ليان</span>
+                    <span id="outDate" class="editable-text">الخميس، 20 أغسطس 2026</span>
+                    <span id="outLoc" class="editable-text"><a href="#" class="loc-pin"><i class="fas fa-location-dot"></i> قاعة الثريا الملكية</a></span>
+                    <span id="outInv" class="editable-text">الداعي: عائلات الهاشمي</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-section">
+        <div class="panel">
+            <div class="label-s"><i class="fas fa-mouse-pointer"></i> ١. اختر النص للتعديل (أو اسحبه مباشرة على الصورة)</div>
+            <div class="target-selector">
+                <button class="target-btn active" onclick="setTarget('outIntro', this)">المقدمة</button>
+                <button class="target-btn" onclick="setTarget('outNames', this)">الأسماء</button>
+                <button class="target-btn" onclick="setTarget('outDate', this)">التاريخ</button>
+                <button class="target-btn" onclick="setTarget('outLoc', this)">الموقع</button>
+                <button class="target-btn" onclick="setTarget('outInv', this)">الداعي</button>
+            </div>
+            <input type="text" id="activeInput" class="input-box" style="margin-top:10px;" placeholder="اكتب النص هنا..." oninput="syncActiveText(this.value)">
+        </div>
+
+        <div class="panel">
+            <div class="label-s"><i class="fas fa-palette"></i> ٢. اختر لون النص</div>
+            <div class="responsive-grid">
+                <div class="color-circle" style="background: var(--g1)" onclick="applyColor('g1', this)"></div>
+                <div class="color-circle" style="background: var(--g2)" onclick="applyColor('g2', this)"></div>
+                <div class="color-circle" style="background: var(--g3)" onclick="applyColor('g3', this)"></div>
+                <div class="color-circle" style="background: var(--g4)" onclick="applyColor('g4', this)"></div>
+                <div class="color-circle" style="background: var(--g5)" onclick="applyColor('g5', this)"></div>
+                <div class="color-circle" style="background: var(--g6)" onclick="applyColor('g6', this)"></div>
+                <div class="color-circle" style="background: var(--g7)" onclick="applyColor('g7', this)"></div>
+                <div class="color-circle" style="background: var(--g8)" onclick="applyColor('g8', this)"></div>
+                <div class="color-circle" style="background: var(--g9)" onclick="applyColor('g9', this)"></div>
+                <div class="color-circle" style="background: var(--g10)" onclick="applyColor('g10', this)"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="label-s"><i class="fas fa-font"></i> ٣. اختر نوع الخط</div>
+            <div class="font-grid">
+                <div class="font-opt" style="font-family:'Amiri'" onclick="applyFont('Amiri', this)">أميري</div>
+                <div class="font-opt" style="font-family:'Aref Ruqaa'" onclick="applyFont('Aref Ruqaa', this)">رقعة</div>
+                <div class="font-opt" style="font-family:'Reem Kufi'" onclick="applyFont('Reem Kufi', this)">كوفي</div>
+                <div class="font-opt" style="font-family:'Lateef'" onclick="applyFont('Lateef', this)">قصص</div>
+                <div class="font-opt" style="font-family:'Changa'" onclick="applyFont('Changa', this)">فارس</div>
+                <div class="font-opt" style="font-family:'Tajawal'" onclick="applyFont('Tajawal', this)">تجول</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="label-s"><i class="fas fa-image"></i> ٤. اختر خلفية البطاقة</div>
+            <div class="bg-controls">
+                <div class="bg-grid" id="bgGrid"></div>
+                <label for="bgUpload" class="upload-btn">
+                    <i class="fas fa-upload"></i> ارفع صورتك الخاصة
+                </label>
+                <input type="file" id="bgUpload" accept="image/*">
+            </div>
+            <button class="save-btn" onclick="saveImage()"><i class="fas fa-download"></i> حفظ الدعوة كصورة</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTarget = 'outIntro';
+
+    const bgs = ['https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800','https://images.unsplash.com/photo-1519741497674-611481863552?w=800','https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800','https://images.unsplash.com/photo-1544161513-0179fe746fd5?w=800','https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800','https://images.unsplash.com/photo-1516589174422-950c0477611c?w=800','https://images.unsplash.com/photo-1530103043960-ef38714abb15?w=800','https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800'];
+
+    function init() {
+        // تهيئة الخلفيات الافتراضية
+        const grid = document.getElementById('bgGrid');
+        bgs.forEach((url, i) => createBgThumb(url, i === 0));
+
+        // تفعيل أول عنصر
+        setTarget('outIntro', document.querySelector('.target-btn'));
+
+        // تفعيل ميزة السحب والإفلات
+        document.querySelectorAll('.editable-text').forEach(makeDraggable);
+
+        // تفعيل زر رفع الصور
+        document.getElementById('bgUpload').addEventListener('change', handleImageUpload);
+    }
+
+    function createBgThumb(url, isActive = false) {
+        const grid = document.getElementById('bgGrid');
+        const d = document.createElement('div');
+        d.className = 'bg-thumb';
+        if(isActive) d.classList.add('active');
+        d.style.backgroundImage = `url('${url}')`;
+        d.onclick = () => {
+            document.getElementById('card').style.backgroundImage = `url('${url}')`;
+            document.querySelectorAll('.bg-thumb').forEach(el => el.classList.remove('active'));
+            d.classList.add('active');
+        };
+        grid.appendChild(d);
+        return d;
+    }
+
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+            document.getElementById('card').style.backgroundImage = `url('${imageUrl}')`;
+            const newThumb = createBgThumb(imageUrl, true);
+            document.querySelectorAll('.bg-thumb').forEach(el => el.classList.remove('active'));
+            newThumb.classList.add('active');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function setTarget(id, btn) {
+        currentTarget = id;
+        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('active-target'));
+        const targetEl = document.getElementById(id);
+        targetEl.classList.add('active-target');
+        
+        if(btn) {
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        
+        document.getElementById('activeInput').value = targetEl.innerText;
+        document.getElementById('activeInput').focus();
+    }
+
+    function syncActiveText(val) {
+        const el = document.getElementById(currentTarget);
+        if (currentTarget === 'outLoc') {
+            el.innerHTML = `<a href="#" class="loc-pin"><i class="fas fa-location-dot"></i> ${val}</a>`;
+        } else {
+            el.innerText = val;
+        }
+    }
+
+    function applyColor(g, el) {
+        const target = document.getElementById(currentTarget);
+        target.style.color = 'transparent';
+        target.style.webkitTextFillColor = 'transparent';
+        target.style.background = `var(--${g})`;
+        target.style.webkitBackgroundClip = 'text';
+        document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function applyFont(font, el) {
+        document.getElementById(currentTarget).style.fontFamily = font;
+        document.querySelectorAll('.font-opt').forEach(f => f.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function saveImage() {
+        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('active-target', 'dragging'));
+        const btn = document.querySelector('.save-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+
+        html2canvas(document.getElementById('captureArea'), { scale: 3, useCORS: true, backgroundColor: null })
+            .then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Invitation-Card-Pro.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerHTML = '<i class="fas fa-download"></i> حفظ الدعوة كصورة';
+            });
+    }
+
+    // --- شيفرة السحب والإفلات (Drag and Drop) ---
+    let activeElement = null;
+    let initialX, initialY, xOffset = 0, yOffset = 0;
+
+    function makeDraggable(el) {
+        el.addEventListener("mousedown", dragStart);
+        el.addEventListener("touchstart", dragStart, { passive: false });
+    }
+
+    function dragStart(e) {
+        activeElement = this;
+        setTarget(activeElement.id); // عند البدء بالسحب، نحدد العنصر كمستهدف للتعديل
+
+        if (e.type === "touchstart") {
+            initialX = e.touches[0].clientX - xOffset;
+            initialY = e.touches[0].clientY - yOffset;
+        } else {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+        }
+        
+        const rect = activeElement.getBoundingClientRect();
+        const parentRect = activeElement.parentElement.getBoundingClientRect();
+        xOffset = e.clientX - rect.left + parentRect.left;
+        yOffset = e.clientY - rect.top + parentRect.top;
+
+        activeElement.classList.add('dragging');
+        document.addEventListener("mousemove", drag);
+        document.addEventListener("touchmove", drag, { passive: false });
+        document.addEventListener("mouseup", dragEnd);
+        document.addEventListener("touchend", dragEnd);
+    }
+
+    function drag(e) {
+        if (!activeElement) return;
+        e.preventDefault();
+
+        let currentX, currentY;
+        if (e.type === "touchmove") {
+            currentX = e.touches[0].clientX;
+            currentY = e.touches[0].clientY;
+        } else {
+            currentX = e.clientX;
+            currentY = e.clientY;
+        }
+
+        let newX = currentX - xOffset;
+        let newY = currentY - yOffset;
+
+        // حدود الحركة داخل البطاقة
+        const parentRect = activeElement.parentElement.getBoundingClientRect();
+        newX = Math.max(0, Math.min(newX, parentRect.width - activeElement.offsetWidth));
+        newY = Math.max(0, Math.min(newY, parentRect.height - activeElement.offsetHeight));
+
+        activeElement.style.left = `${newX}px`;
+        activeElement.style.top = `${newY}px`;
+        activeElement.style.transform = ''; // إلغاء transform السابق
+    }
+
+    function dragEnd(e) {
+        if (!activeElement) return;
+        activeElement.classList.remove('dragging');
+        activeElement = null;
+        xOffset = 0;
+        yOffset = 0;
+
+        document.removeEventListener("mousemove", drag);
+        document.removeEventListener("touchmove", drag);
+        document.removeEventListener("mouseup", dragEnd);
+        document.removeEventListener("touchend", dragEnd);
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
