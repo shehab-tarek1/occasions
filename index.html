@@ -1,374 +1,571 @@
+تم تنفيذ التعديلات المطلوبة بدقة:
+
+استبدال الخلفيات التالفة: تم استبدال الصور (4، 6، 12، 13، 14، 15) بصور جديدة عالية الجودة ومضمونة من Unsplash (رخام فخم، زخرفة إسلامية، كحلي ملكي، سماء ليلية، خشب داكن، إضاءة خافتة).
+
+إضافة 5 ألوان رسمية: تمت إضافة 5 تدرجات جديدة في نهاية القائمة (شامبانيا، كحلي دبلوماسي، رمادي رسمي، عنابي ملكي، زيتي غامق).
+
+تحسين التأثير الزجاجي: تم تقليل حدة اللون الأبيض في الوضع الزجاجي ليصبح شفافاً وناعماً جداً (Subtle Frost)، مع الحفاظ على التغبيش (Blur) ليكون النص واضحاً دون أن تطغى الطبقة البيضاء على الخلفية.
+
+إليك الكود المحدث بالكامل (V14):
+
+code
+Html
+play_circle
+download
+content_copy
+expand_less
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إيفنت برو V7 - المصمم التفاعلي</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Reem+Kufi:wght@400;700&family=Lateef&family=Changa:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <title>مصمم دعوات برو V14 - النسخة الرسمية</title>
+    
+    <!-- الخطوط -->
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@700&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&family=Cairo:wght@700&family=Changa:wght@700&family=El+Messiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@700&family=Lateef:wght@700&family=Lemonada:wght@700&family=Mada:wght@700&family=Noto+Kufi+Arabic:wght@700&family=Noto+Naskh+Arabic:wght@700&family=Reem+Kufi:wght@700&family=Scheherazade+New:wght@700&family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <style>
-        :root {
-            --primary: #d4af37;
-            --bg-dark: #0a0a0a;
-            --panel-bg: #1a1a1a;
-            --border: #333;
-            
-            /* -- لوحة الألوان الجديدة والمدموجة -- */
-            --g1: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); /* ذهبي ملكي */
-            --g2: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); /* بنفسجي سماوي */
-            --g3: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* فوشيا ناري */
-            --g4: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); /* نعناعي بنفسجي */
-            --g5: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); /* وردي باستيل */
-            --g6: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); /* أخضر ليموني */
-            --g7: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); /* مرجاني هادئ */
-            --g8: linear-gradient(45deg, #2c3e50, #3498db); /* أزرق محيطي */
-            --g9: linear-gradient(45deg, #870000, #190a05); /* أحمر غامق */
-            --g10: linear-gradient(45deg, #e0e0e0, #ffffff, #9e9e9e, #bdbdbd); /* فضي لامع */
-        }
+<style>
+    :root {
+        --primary: #d4af37;
+        --bg-dark: #121212;
+        --panel-bg: #1e1e1e;
+        --border: #333;
+    }
 
-        * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Cairo', sans-serif; user-select: none; }
+    body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Cairo', sans-serif; overflow-x: hidden; touch-action: pan-y; padding-bottom: 80px; }
 
-        .app-container { display: flex; flex-direction: column; gap: 20px; max-width: 1400px; margin: 0 auto; padding: 20px; min-height: 100vh; }
-        .preview-section { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
-        .controls-section { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+    .app-container { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 15px; }
 
-        #captureArea { width: 100%; max-width: 450px; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        .main-card { width: 100%; aspect-ratio: 1/1.414; background-size: cover; background-position: center; position: relative; }
+    /* --- المعاينة --- */
+    .preview-section { display: flex; justify-content: center; position: relative; z-index: 5; margin-bottom: 10px; }
+    
+    #captureArea { 
+        width: 100%; 
+        max-width: 400px; 
+        border-radius: 15px; 
+        overflow: hidden; 
+        position: relative; 
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
+        border: 2px solid #333;
+        touch-action: none;
+    }
+    
+    .main-card { width: 100%; aspect-ratio: 1/1.414; background-size: cover; background-position: center; position: relative; overflow: hidden; transition: all 0.5s ease; }
+    
+    /* الطبقة الشفافة/الزجاجية */
+    .overlay-layer { 
+        position: absolute; 
+        inset: 0; 
+        pointer-events: none; 
+        transition: all 0.3s ease;
+        background: rgba(0,0,0,0.3);
+    }
+    
+    /* تحسين الزجاج: تقليل البياض وزيادة التغبيش */
+    .overlay-layer.glass {
+        background: rgba(255,255,255,0.05); /* شفافية عالية جداً */
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
 
-        /* --- تعديلات لجعل النصوص قابلة للحركة --- */
-        .content { position: relative; width: 100%; height: 100%; z-index: 2; overflow: hidden; }
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
-        
-        .editable-text {
-            position: absolute;
-            transition: 0.2s ease-out;
-            cursor: grab; /* تغيير المؤشر */
-            display: inline-block;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
-            padding: 8px 12px;
-            border: 1px solid transparent;
-            border-radius: 5px;
-            white-space: nowrap; /* لمنع التفاف النص أثناء السحب */
-        }
-        .editable-text.dragging {
-            cursor: grabbing;
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-        .editable-text.active-target { border-color: var(--primary); background: rgba(212, 175, 55, 0.1); }
+    /* --- النصوص --- */
+    .editable-text {
+        position: absolute;
+        padding: 5px 10px;
+        user-select: none;
+        -webkit-user-select: none;
+        cursor: grab;
+        white-space: nowrap;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        border: 1px solid transparent;
+        z-index: 10;
+        transition: font-size 0.3s, color 0.3s;
+    }
 
-        /* مواضع أولية للنصوص */
-        #outIntro { top: 15%; left: 50%; transform: translateX(-50%); font-family: 'Aref Ruqaa'; font-size: 1.5rem; text-align: center; }
-        #outNames { top: 35%; left: 50%; transform: translateX(-50%); font-family: 'Amiri'; font-size: 3.5rem; font-weight: 700; line-height: 1.2; text-align: center; }
-        #outDate  { top: 65%; left: 50%; transform: translateX(-50%); font-family: 'Cairo'; font-size: 1.1rem; text-align: center; }
-        #outLoc   { top: 75%; left: 50%; transform: translateX(-50%); font-family: 'Cairo'; font-size: 1.1rem; text-align: center; }
-        #outInv   { top: 88%; left: 50%; transform: translateX(-50%); font-family: 'Reem Kufi'; font-size: 1rem; color: var(--primary); text-align: center; }
+    .editable-text.selected { border: 1px dashed rgba(255,255,255,0.7); background: rgba(0,0,0,0.2); border-radius: 8px; }
+    .editable-text.dragging { border: 2px solid var(--primary); background: rgba(212, 175, 55, 0.2); cursor: grabbing; z-index: 100; }
 
-        .loc-pin { display: inline-flex; align-items: center; gap: 5px; color: inherit; text-decoration: none; }
+    /* --- التحكم --- */
+    .controls-section { display: flex; flex-direction: column; gap: 15px; }
+    .panel { background: var(--panel-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); }
+    .panel-title { font-size: 0.95rem; color: var(--primary); margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 8px; }
 
-        .panel { background: var(--panel-bg); border-radius: 15px; padding: 20px; border: 1px solid var(--border); }
-        .label-s { font-size: 0.9rem; color: var(--primary); margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+    /* أزرار النماذج */
+    .templates-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 10px; }
+    .tpl-btn { background: #333; color: #fff; border: 1px solid #444; padding: 10px 5px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .tpl-btn i { font-size: 1.2rem; color: var(--primary); }
+    .tpl-btn:hover, .tpl-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+    .tpl-btn.active i { color: #000; }
 
-        .target-selector { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 5px; padding-bottom: 10px; }
-        .target-btn { background: #333; color: #aaa; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 13px; }
-        .target-btn.active { background: var(--primary); color: #000; font-weight: bold; }
+    /* التحكم في الطبقة */
+    .overlay-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .toggle-btn { background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
+    .range-slider { flex: 1; height: 5px; -webkit-appearance: none; background: #444; border-radius: 5px; outline: none; }
+    .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
-        .responsive-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); }
-        .color-circle { aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 2px solid #444; transition: 0.2s; }
-        .color-circle.active { border-color: #fff; transform: scale(1.15); }
+    /* العناصر الأخرى */
+    .target-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
+    .target-btn { background: #2a2a2a; color: #ccc; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+    .target-btn.active { background: var(--primary); color: #000; font-weight: bold; transform: scale(1.05); }
 
-        .font-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-        .font-opt { background: #252525; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; cursor: pointer; border: 1px solid #444; }
-        .font-opt.active { border-color: var(--primary); color: var(--primary); }
+    .input-box { width: 100%; background: #2a2a2a; border: 1px solid #444; padding: 14px; border-radius: 10px; color: #fff; margin-top: 10px; font-size: 1rem; box-sizing: border-box; }
+    
+    .grid-fonts { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; }
+    .font-card { background: #252525; border: 1px solid #333; border-radius: 8px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; }
+    .font-card.active { border: 2px solid var(--primary); background: #1a1a1a; color: var(--primary); }
 
-        .input-box { width: 100%; background: #252525; border: 1px solid #444; padding: 14px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
-        .input-box:focus { border-color: var(--primary); }
+    .grid-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 12px; }
+    .color-circle { aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 2px solid #444; transition: transform 0.2s; position: relative; }
+    .color-circle.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
 
-        /* --- تصميم قسم رفع الخلفية --- */
-        .bg-controls { display: flex; flex-direction: column; gap: 15px; }
-        .bg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
-        .bg-thumb { aspect-ratio: 3/4; border-radius: 6px; background-size: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.7; transition: 0.2s; }
-        .bg-thumb:hover { opacity: 1; }
-        .bg-thumb.active { border-color: var(--primary); opacity: 1; transform: scale(1.05); }
+    .grid-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
+    .img-thumb { width: 100%; aspect-ratio: 1; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+    .img-thumb.active { border-color: var(--primary); opacity: 0.8; transform: scale(0.95); }
 
-        .upload-btn {
-            background: #333; padding: 12px; border-radius: 10px; text-align: center;
-            cursor: pointer; font-size: 0.9rem; transition: background 0.3s;
-        }
-        .upload-btn:hover { background: #444; }
-        #bgUpload { display: none; } /* إخفاء حقل الرفع الأصلي */
+    .save-btn { width: 100%; background: linear-gradient(45deg, #d4af37, #f7ef8a); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
 
-        .save-btn { width: 100%; background: var(--g1); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
-        
-        @media (min-width: 992px) {
-            .app-container { flex-direction: row; align-items: flex-start; }
-            .preview-section { position: sticky; top: 20px; height: calc(100vh - 40px); align-items: center; }
-            .controls-section { flex: 1.2; max-width: 600px; }
-        }
-        @media (max-width: 599px) {
-            .app-container { padding: 10px; gap: 15px; }
-            .panel { padding: 15px; }
-            #outNames { font-size: 2.8rem; }
-        }
-    </style>
+    @media (min-width: 900px) {
+        .app-container { flex-direction: row; align-items: flex-start; }
+        .preview-section { flex: 1; position: sticky; top: 20px; }
+        .controls-section { flex: 1; }
+    }
+</style>
 </head>
 <body>
 
 <div class="app-container">
-    
     <div class="preview-section">
         <div id="captureArea">
-            <div id="card" class="main-card" style="background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800')">
-                <div class="overlay"></div>
+            <div id="card" class="main-card" style="background-image: url('https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80')">
+                <!-- طبقة الظل/الزجاج -->
+                <div id="cardOverlay" class="overlay-layer"></div>
+                
                 <div class="content">
-                    <span id="outIntro" class="editable-text">نتشرف بدعوتكم لحضور حفل</span>
-                    <span id="outNames" class="editable-text">فارس & ليان</span>
-                    <span id="outDate" class="editable-text">الخميس، 20 أغسطس 2026</span>
-                    <span id="outLoc" class="editable-text"><a href="#" class="loc-pin"><i class="fas fa-location-dot"></i> قاعة الثريا الملكية</a></span>
-                    <span id="outInv" class="editable-text">الداعي: عائلات الهاشمي</span>
+                    <div id="outIntro" class="editable-text" style="top: 15%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">نتشرف بدعوتكم</div>
+                    <div id="outNames" class="editable-text" style="top: 30%; left: 50%; transform: translate(-50%, 0); font-family: 'Amiri', serif; font-size: 2.5rem; font-weight: bold;">أحمد & سارة</div>
+                    <div id="outDate" class="editable-text" style="top: 55%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">الجمعة، 15 أكتوبر 2026</div>
+                    <div id="outLoc" class="editable-text" style="top: 65%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">قاعة الماسة الملكية</div>
+                    <div id="outInv" class="editable-text" style="top: 85%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">الداعي: عائلة محمد</div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="controls-section">
+        
+        <!-- قسم النماذج الجاهزة -->
         <div class="panel">
-            <div class="label-s"><i class="fas fa-mouse-pointer"></i> ١. اختر النص للتعديل (أو اسحبه مباشرة على الصورة)</div>
-            <div class="target-selector">
-                <button class="target-btn active" onclick="setTarget('outIntro', this)">المقدمة</button>
-                <button class="target-btn" onclick="setTarget('outNames', this)">الأسماء</button>
-                <button class="target-btn" onclick="setTarget('outDate', this)">التاريخ</button>
-                <button class="target-btn" onclick="setTarget('outLoc', this)">الموقع</button>
-                <button class="target-btn" onclick="setTarget('outInv', this)">الداعي</button>
-            </div>
-            <input type="text" id="activeInput" class="input-box" style="margin-top:10px;" placeholder="اكتب النص هنا..." oninput="syncActiveText(this.value)">
-        </div>
-
-        <div class="panel">
-            <div class="label-s"><i class="fas fa-palette"></i> ٢. اختر لون النص</div>
-            <div class="responsive-grid">
-                <div class="color-circle" style="background: var(--g1)" onclick="applyColor('g1', this)"></div>
-                <div class="color-circle" style="background: var(--g2)" onclick="applyColor('g2', this)"></div>
-                <div class="color-circle" style="background: var(--g3)" onclick="applyColor('g3', this)"></div>
-                <div class="color-circle" style="background: var(--g4)" onclick="applyColor('g4', this)"></div>
-                <div class="color-circle" style="background: var(--g5)" onclick="applyColor('g5', this)"></div>
-                <div class="color-circle" style="background: var(--g6)" onclick="applyColor('g6', this)"></div>
-                <div class="color-circle" style="background: var(--g7)" onclick="applyColor('g7', this)"></div>
-                <div class="color-circle" style="background: var(--g8)" onclick="applyColor('g8', this)"></div>
-                <div class="color-circle" style="background: var(--g9)" onclick="applyColor('g9', this)"></div>
-                <div class="color-circle" style="background: var(--g10)" onclick="applyColor('g10', this)"></div>
+            <div class="panel-title"><i class="fas fa-layer-group"></i> 5 نماذج تصميم جاهزة</div>
+            <div class="templates-grid">
+                <button class="tpl-btn active" onclick="applyTemplate(0)"><i class="fas fa-star"></i> كلاسيك</button>
+                <button class="tpl-btn" onclick="applyTemplate(1)"><i class="fas fa-gem"></i> فخامة</button>
+                <button class="tpl-btn" onclick="applyTemplate(2)"><i class="fas fa-leaf"></i> مودرن</button>
+                <button class="tpl-btn" onclick="applyTemplate(3)"><i class="fas fa-moon"></i> ليلي</button>
+                <button class="tpl-btn" onclick="applyTemplate(4)"><i class="fas fa-heart"></i> رومانسي</button>
             </div>
         </div>
 
+        <!-- التحكم في الطبقة -->
         <div class="panel">
-            <div class="label-s"><i class="fas fa-font"></i> ٣. اختر نوع الخط</div>
-            <div class="font-grid">
-                <div class="font-opt" style="font-family:'Amiri'" onclick="applyFont('Amiri', this)">أميري</div>
-                <div class="font-opt" style="font-family:'Aref Ruqaa'" onclick="applyFont('Aref Ruqaa', this)">رقعة</div>
-                <div class="font-opt" style="font-family:'Reem Kufi'" onclick="applyFont('Reem Kufi', this)">كوفي</div>
-                <div class="font-opt" style="font-family:'Lateef'" onclick="applyFont('Lateef', this)">قصص</div>
-                <div class="font-opt" style="font-family:'Changa'" onclick="applyFont('Changa', this)">فارس</div>
-                <div class="font-opt" style="font-family:'Tajawal'" onclick="applyFont('Tajawal', this)">تجول</div>
+            <div class="panel-title">
+                <span><i class="fas fa-adjust"></i> تأثير الخلفية (ظل / زجاج)</span>
+                <button class="toggle-btn" onclick="toggleOverlayMode()" id="overlayToggleBtn">وضع الظلام</button>
+            </div>
+            <div class="overlay-controls">
+                <i class="fas fa-eye-slash" style="font-size:0.8rem; color:#777;"></i>
+                <input type="range" min="0" max="100" value="30" class="range-slider" id="overlaySlider" oninput="updateOverlay()">
+                <i class="fas fa-eye" style="font-size:0.8rem; color:#fff;"></i>
             </div>
         </div>
 
         <div class="panel">
-            <div class="label-s"><i class="fas fa-image"></i> ٤. اختر خلفية البطاقة</div>
-            <div class="bg-controls">
-                <div class="bg-grid" id="bgGrid"></div>
-                <label for="bgUpload" class="upload-btn">
-                    <i class="fas fa-upload"></i> ارفع صورتك الخاصة
-                </label>
-                <input type="file" id="bgUpload" accept="image/*">
+            <div class="panel-title"><i class="fas fa-pen"></i> المحتوى (اضغط مطولاً للتحريك)</div>
+            <div class="target-scroll">
+                <button class="target-btn active" onclick="selectText('outIntro')">المقدمة</button>
+                <button class="target-btn" onclick="selectText('outNames')">الأسماء</button>
+                <button class="target-btn" onclick="selectText('outDate')">التاريخ</button>
+                <button class="target-btn" onclick="selectText('outLoc')">الموقع</button>
+                <button class="target-btn" onclick="selectText('outInv')">الداعي</button>
             </div>
-            <button class="save-btn" onclick="saveImage()"><i class="fas fa-download"></i> حفظ الدعوة كصورة</button>
+            <input type="text" id="mainInput" class="input-box" placeholder="اكتب النص هنا..." oninput="updateText(this.value)">
         </div>
+
+        <div class="panel">
+            <div class="panel-title"><i class="fas fa-font"></i> نوع الخط</div>
+            <div class="grid-fonts" id="fontGrid"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title"><i class="fas fa-palette"></i> 20 لون رسمي ولامع</div>
+            <div class="grid-colors" id="colorGrid"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title"><i class="fas fa-image"></i> 15 خلفية محدثة</div>
+            <div class="grid-images" id="bgGrid"></div>
+            <label class="target-btn" style="display:block; text-align:center; margin-top:10px; width:auto; background:#333;">
+                <i class="fas fa-upload"></i> رفع صورة خاصة
+                <input type="file" hidden onchange="uploadBg(this)">
+            </label>
+        </div>
+
+        <button class="save-btn" onclick="downloadCard()">
+            <i class="fas fa-download"></i> حفظ التصميم
+        </button>
     </div>
 </div>
 
 <script>
-    let currentTarget = 'outIntro';
+    // --- 1. البيانات ---
+    
+    // تم تحديث الروابط التالفة بروابط Unsplash مضمونة
+    const backgrounds = [
+        'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80', // 1. تجريدي غامق
+        'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80', // 2. حفلة ليلية
+        'https://images.unsplash.com/photo-1507915977619-6ccfe8003ae6?auto=format&fit=crop&w=600&q=80', // 3. ذهبي
+        'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=600&q=80', // 4. رخام أبيض (جديد)
+        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80', // 5. زفاف كلاسيك
+        'https://images.unsplash.com/photo-1596627689623-644b93af8848?auto=format&fit=crop&w=600&q=80', // 6. إسلامي/فوانيس (جديد)
+        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80', // 7. موسيقى
+        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=600&q=80', // 8. ورد زهري
+        'https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=600&q=80', // 9. بيج هادئ
+        'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=600&q=80', // 10. خواتم
+        'https://images.unsplash.com/photo-1532323544230-7191fd51bc1b?auto=format&fit=crop&w=600&q=80', // 11. بوكيه
+        'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80', // 12. كحلي ملكي (جديد)
+        'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=600&q=80', // 13. سماء ليلية (جديد)
+        'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80', // 14. خشب داكن (جديد)
+        'https://images.unsplash.com/photo-1544194216-7c3ee7408468?auto=format&fit=crop&w=600&q=80'  // 15. إضاءة بوكيه (جديد)
+    ];
 
-    const bgs = ['https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800','https://images.unsplash.com/photo-1519741497674-611481863552?w=800','https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800','https://images.unsplash.com/photo-1544161513-0179fe746fd5?w=800','https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800','https://images.unsplash.com/photo-1516589174422-950c0477611c?w=800','https://images.unsplash.com/photo-1530103043960-ef38714abb15?w=800','https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800'];
+    // ألوان لامعة + 5 ألوان رسمية جديدة
+    const shinyGradients = [
+        { bg: 'linear-gradient(45deg, #FFD700, #FFFACD, #DAA520)', name: 'ذهب خالص' },
+        { bg: 'linear-gradient(45deg, #C0C0C0, #FFFFFF, #A9A9A9)', name: 'فضة لامعة' },
+        { bg: 'linear-gradient(45deg, #B8860B, #FFD700, #8B4513)', name: 'برونز عتيق' },
+        { bg: 'linear-gradient(45deg, #ff9a9e, #fad0c4, #ff9a9e)', name: 'روز جولد' },
+        { bg: 'linear-gradient(45deg, #a18cd1, #fbc2eb, #a18cd1)', name: 'ألماس بنفسجي' },
+        { bg: 'linear-gradient(to right, #ffffff, #e6e6e6, #ffffff)', name: 'لؤلؤي' },
+        { bg: 'linear-gradient(45deg, #2b5876, #4e4376, #2b5876)', name: 'ياقوت أزرق' },
+        { bg: 'linear-gradient(45deg, #000000, #434343, #000000)', name: 'أسود فحمي' },
+        { bg: 'linear-gradient(45deg, #134E5E, #71B280, #134E5E)', name: 'زمرد' },
+        { bg: 'linear-gradient(45deg, #c31432, #240b36, #c31432)', name: 'ياقوت أحمر' },
+        { bg: 'linear-gradient(45deg, #DAA520, #F0E68C, #DAA520)', name: 'ذهب مطفي' },
+        { bg: 'linear-gradient(45deg, #8E2DE2, #4A00E0, #8E2DE2)', name: 'أوركيد' },
+        { bg: 'linear-gradient(45deg, #f12711, #f5af19, #f12711)', name: 'نار' },
+        { bg: 'linear-gradient(45deg, #00c6ff, #0072ff, #00c6ff)', name: 'توباز أزرق' },
+        { bg: 'linear-gradient(45deg, #D3CCE3, #E9E4F0, #D3CCE3)', name: 'بلاتينيوم' },
+        // الألوان الـ 5 الرسمية الجديدة
+        { bg: 'linear-gradient(to right, #F7E7CE, #E6D2B5)', name: 'شامبانيا' }, // 16
+        { bg: 'linear-gradient(to right, #141E30, #243B55)', name: 'كحلي دبلوماسي' }, // 17
+        { bg: 'linear-gradient(to right, #2C3E50, #4CA1AF)', name: 'رمادي رسمي' }, // 18
+        { bg: 'linear-gradient(to right, #40010D, #6E021B)', name: 'عنابي ملكي' }, // 19
+        { bg: 'linear-gradient(to right, #1D2B16, #3C5A2E)', name: 'زيتي غامق' } // 20
+    ];
 
-    function init() {
-        // تهيئة الخلفيات الافتراضية
-        const grid = document.getElementById('bgGrid');
-        bgs.forEach((url, i) => createBgThumb(url, i === 0));
+    const fontsList = [
+        { name: 'كايرو', font: "'Cairo', sans-serif" },
+        { name: 'أميري', font: "'Amiri', serif" },
+        { name: 'رقعة', font: "'Aref Ruqaa', serif" },
+        { name: 'كوفي', font: "'Reem Kufi', sans-serif" },
+        { name: 'تجوال', font: "'Tajawal', sans-serif" },
+        { name: 'المراعي', font: "'Almarai', sans-serif" },
+        { name: 'تشانجا', font: "'Changa', sans-serif" },
+        { name: 'المسيري', font: "'El Messiri', sans-serif" },
+        { name: 'نسخ حديث', font: "'IBM Plex Sans Arabic', sans-serif" },
+        { name: 'لطيف', font: "'Lateef', serif" },
+        { name: 'ليمونادة', font: "'Lemonada', cursive" },
+        { name: 'مدى', font: "'Mada', sans-serif" },
+        { name: 'كوفي عريض', font: "'Noto Kufi Arabic', sans-serif" },
+        { name: 'نسخ', font: "'Noto Naskh Arabic', serif" },
+        { name: 'شهرزاد', font: "'Scheherazade New', serif" }
+    ];
 
-        // تفعيل أول عنصر
-        setTarget('outIntro', document.querySelector('.target-btn'));
-
-        // تفعيل ميزة السحب والإفلات
-        document.querySelectorAll('.editable-text').forEach(makeDraggable);
-
-        // تفعيل زر رفع الصور
-        document.getElementById('bgUpload').addEventListener('change', handleImageUpload);
-    }
-
-    function createBgThumb(url, isActive = false) {
-        const grid = document.getElementById('bgGrid');
-        const d = document.createElement('div');
-        d.className = 'bg-thumb';
-        if(isActive) d.classList.add('active');
-        d.style.backgroundImage = `url('${url}')`;
-        d.onclick = () => {
-            document.getElementById('card').style.backgroundImage = `url('${url}')`;
-            document.querySelectorAll('.bg-thumb').forEach(el => el.classList.remove('active'));
-            d.classList.add('active');
-        };
-        grid.appendChild(d);
-        return d;
-    }
-
-    function handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageUrl = e.target.result;
-            document.getElementById('card').style.backgroundImage = `url('${imageUrl}')`;
-            const newThumb = createBgThumb(imageUrl, true);
-            document.querySelectorAll('.bg-thumb').forEach(el => el.classList.remove('active'));
-            newThumb.classList.add('active');
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function setTarget(id, btn) {
-        currentTarget = id;
-        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('active-target'));
-        const targetEl = document.getElementById(id);
-        targetEl.classList.add('active-target');
-        
-        if(btn) {
-            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    // --- 2. النماذج الجاهزة (Templates) ---
+    const templates = [
+        { // 0: كلاسيك
+            bgIndex: 4, 
+            overlay: { mode: 'dark', opacity: 20 },
+            positions: {
+                outIntro: { top: '15%', left: '50%', font: "'Cairo', sans-serif" },
+                outNames: { top: '30%', left: '50%', font: "'Amiri', serif" },
+                outDate: { top: '55%', left: '50%' },
+                outLoc: { top: '65%', left: '50%' },
+                outInv: { top: '85%', left: '50%' }
+            }
+        },
+        { // 1: فخامة
+            bgIndex: 0, 
+            overlay: { mode: 'dark', opacity: 60 },
+            positions: {
+                outIntro: { top: '10%', left: '50%' },
+                outNames: { top: '40%', left: '50%', font: "'Aref Ruqaa', serif" },
+                outDate: { top: '70%', left: '50%' },
+                outLoc: { top: '80%', left: '50%' },
+                outInv: { top: '90%', left: '50%' }
+            }
+        },
+        { // 2: مودرن (تم تحديث الخلفية لـ رخام جديد)
+            bgIndex: 3, 
+            overlay: { mode: 'glass', opacity: 30 },
+            positions: {
+                outIntro: { top: '20%', left: '80%' },
+                outNames: { top: '35%', left: '50%', font: "'Cairo', sans-serif" },
+                outDate: { top: '50%', left: '50%' },
+                outLoc: { top: '60%', left: '50%' },
+                outInv: { top: '80%', left: '50%' }
+            }
+        },
+        { // 3: ليلي
+            bgIndex: 1, 
+            overlay: { mode: 'dark', opacity: 50 },
+            positions: {
+                outIntro: { top: '10%', left: '50%' },
+                outNames: { top: '25%', left: '50%', font: "'Reem Kufi', sans-serif" },
+                outDate: { top: '80%', left: '50%' },
+                outLoc: { top: '88%', left: '50%' },
+                outInv: { top: '50%', left: '50%' }
+            }
+        },
+        { // 4: رومانسي
+            bgIndex: 7, 
+            overlay: { mode: 'glass', opacity: 40 },
+            positions: {
+                outIntro: { top: '30%', left: '50%' },
+                outNames: { top: '45%', left: '50%', font: "'Lemonada', cursive" },
+                outDate: { top: '60%', left: '50%' },
+                outLoc: { top: '70%', left: '50%' },
+                outInv: { top: '85%', left: '50%' }
+            }
         }
-        
-        document.getElementById('activeInput').value = targetEl.innerText;
-        document.getElementById('activeInput').focus();
+    ];
+
+    let currentId = 'outIntro';
+    let dragTimer = null;
+    let isDragging = false;
+    let shiftX = 0, shiftY = 0;
+    let isGlassMode = false;
+
+    window.onload = () => {
+        initFonts();
+        initColors();
+        initBackgrounds();
+        setupInteraction();
+        selectText('outIntro');
+        updateOverlay();
+    };
+
+    function applyTemplate(index) {
+        const tpl = templates[index];
+        changeBg(backgrounds[tpl.bgIndex], null);
+        isGlassMode = (tpl.overlay.mode === 'glass');
+        document.getElementById('overlaySlider').value = tpl.overlay.opacity;
+        updateOverlayUI();
+        updateOverlay();
+
+        for (const [key, val] of Object.entries(tpl.positions)) {
+            const el = document.getElementById(key);
+            el.style.top = val.top;
+            el.style.left = val.left;
+            el.style.transform = 'translate(-50%, 0)'; 
+            if (val.font) el.style.fontFamily = val.font;
+        }
+        document.querySelectorAll('.tpl-btn').forEach((b, i) => b.classList.toggle('active', i === index));
     }
 
-    function syncActiveText(val) {
-        const el = document.getElementById(currentTarget);
-        if (currentTarget === 'outLoc') {
-            el.innerHTML = `<a href="#" class="loc-pin"><i class="fas fa-location-dot"></i> ${val}</a>`;
+    function toggleOverlayMode() {
+        isGlassMode = !isGlassMode;
+        updateOverlayUI();
+        updateOverlay();
+    }
+
+    function updateOverlayUI() {
+        const btn = document.getElementById('overlayToggleBtn');
+        const layer = document.getElementById('cardOverlay');
+        
+        if (isGlassMode) {
+            btn.innerText = "وضع الزجاج";
+            btn.style.background = "#fff";
+            btn.style.color = "#000";
+            layer.classList.add('glass');
         } else {
-            el.innerText = val;
+            btn.innerText = "وضع الظلام";
+            btn.style.background = "#333";
+            btn.style.color = "#fff";
+            layer.classList.remove('glass');
         }
     }
 
-    function applyColor(g, el) {
-        const target = document.getElementById(currentTarget);
-        target.style.color = 'transparent';
-        target.style.webkitTextFillColor = 'transparent';
-        target.style.background = `var(--${g})`;
-        target.style.webkitBackgroundClip = 'text';
-        document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    function applyFont(font, el) {
-        document.getElementById(currentTarget).style.fontFamily = font;
-        document.querySelectorAll('.font-opt').forEach(f => f.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    function saveImage() {
-        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('active-target', 'dragging'));
-        const btn = document.querySelector('.save-btn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
-
-        html2canvas(document.getElementById('captureArea'), { scale: 3, useCORS: true, backgroundColor: null })
-            .then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'Invitation-Card-Pro.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                btn.innerHTML = '<i class="fas fa-download"></i> حفظ الدعوة كصورة';
-            });
-    }
-
-    // --- شيفرة السحب والإفلات (Drag and Drop) ---
-    let activeElement = null;
-    let initialX, initialY, xOffset = 0, yOffset = 0;
-
-    function makeDraggable(el) {
-        el.addEventListener("mousedown", dragStart);
-        el.addEventListener("touchstart", dragStart, { passive: false });
-    }
-
-    function dragStart(e) {
-        activeElement = this;
-        setTarget(activeElement.id); // عند البدء بالسحب، نحدد العنصر كمستهدف للتعديل
-
-        if (e.type === "touchstart") {
-            initialX = e.touches[0].clientX - xOffset;
-            initialY = e.touches[0].clientY - yOffset;
-        } else {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-        }
+    function updateOverlay() {
+        const opacity = document.getElementById('overlaySlider').value / 100;
+        const layer = document.getElementById('cardOverlay');
         
-        const rect = activeElement.getBoundingClientRect();
-        const parentRect = activeElement.parentElement.getBoundingClientRect();
-        xOffset = e.clientX - rect.left + parentRect.left;
-        yOffset = e.clientY - rect.top + parentRect.top;
-
-        activeElement.classList.add('dragging');
-        document.addEventListener("mousemove", drag);
-        document.addEventListener("touchmove", drag, { passive: false });
-        document.addEventListener("mouseup", dragEnd);
-        document.addEventListener("touchend", dragEnd);
+        if (isGlassMode) {
+            // تقليل البياض بشكل كبير (الحد الأقصى 0.15 بدلاً من 1)
+            layer.style.backgroundColor = `rgba(255, 255, 255, ${opacity * 0.15})`;
+            // زيادة التغبيش كلما زادت الشفافية
+            layer.style.backdropFilter = `blur(${opacity * 8}px)`;
+            layer.style.webkitBackdropFilter = `blur(${opacity * 8}px)`;
+        } else {
+            layer.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
+            layer.style.backdropFilter = 'none';
+            layer.style.webkitBackdropFilter = 'none';
+        }
     }
 
-    function drag(e) {
-        if (!activeElement) return;
+    // --- التفاعل والتحريك ---
+    function setupInteraction() {
+        const texts = document.querySelectorAll('.editable-text');
+        texts.forEach(el => {
+            el.addEventListener('touchstart', handleStart, { passive: false });
+            el.addEventListener('mousedown', handleStart);
+        });
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        document.addEventListener('touchend', handleEnd);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+    }
+
+    function handleStart(e) {
+        const el = e.target;
+        if (!el.classList.contains('editable-text')) return;
+        selectText(el.id);
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        dragTimer = setTimeout(() => {
+            isDragging = true;
+            el.classList.add('dragging');
+            if (navigator.vibrate) navigator.vibrate(50);
+            const rect = el.getBoundingClientRect();
+            shiftX = clientX - rect.left;
+            shiftY = clientY - rect.top;
+        }, 600);
+    }
+
+    function handleMove(e) {
+        if (!isDragging) {
+            if(e.type === 'touchmove') clearTimeout(dragTimer);
+            return;
+        }
         e.preventDefault();
+        const el = document.querySelector('.editable-text.dragging');
+        if (!el) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const containerRect = document.getElementById('captureArea').getBoundingClientRect();
+        
+        let newLeft = clientX - containerRect.left - shiftX;
+        let newTop = clientY - containerRect.top - shiftY;
+        
+        el.style.left = newLeft + 'px';
+        el.style.top = newTop + 'px';
+        el.style.transform = 'none';
+    }
 
-        let currentX, currentY;
-        if (e.type === "touchmove") {
-            currentX = e.touches[0].clientX;
-            currentY = e.touches[0].clientY;
-        } else {
-            currentX = e.clientX;
-            currentY = e.clientY;
+    function handleEnd() {
+        clearTimeout(dragTimer);
+        if (isDragging) {
+            isDragging = false;
+            const el = document.querySelector('.editable-text.dragging');
+            if (el) el.classList.remove('dragging');
         }
-
-        let newX = currentX - xOffset;
-        let newY = currentY - yOffset;
-
-        // حدود الحركة داخل البطاقة
-        const parentRect = activeElement.parentElement.getBoundingClientRect();
-        newX = Math.max(0, Math.min(newX, parentRect.width - activeElement.offsetWidth));
-        newY = Math.max(0, Math.min(newY, parentRect.height - activeElement.offsetHeight));
-
-        activeElement.style.left = `${newX}px`;
-        activeElement.style.top = `${newY}px`;
-        activeElement.style.transform = ''; // إلغاء transform السابق
     }
 
-    function dragEnd(e) {
-        if (!activeElement) return;
-        activeElement.classList.remove('dragging');
-        activeElement = null;
-        xOffset = 0;
-        yOffset = 0;
-
-        document.removeEventListener("mousemove", drag);
-        document.removeEventListener("touchmove", drag);
-        document.removeEventListener("mouseup", dragEnd);
-        document.removeEventListener("touchend", dragEnd);
+    // --- الوظائف المساعدة ---
+    function selectText(id) {
+        currentId = id;
+        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('selected'));
+        document.getElementById(id).classList.add('selected');
+        document.querySelectorAll('.target-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = Array.from(document.querySelectorAll('.target-btn')).find(b => b.getAttribute('onclick').includes(id));
+        if(activeBtn) activeBtn.classList.add('active');
+        document.getElementById('mainInput').value = document.getElementById(id).innerText;
     }
 
-    window.onload = init;
+    function updateText(val) {
+        document.getElementById(currentId).innerText = val;
+    }
+
+    function initFonts() {
+        const grid = document.getElementById('fontGrid');
+        fontsList.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'font-card';
+            div.innerText = f.name;
+            div.style.fontFamily = f.font;
+            div.onclick = () => applyFont(f.font, div);
+            grid.appendChild(div);
+        });
+    }
+
+    function applyFont(fontName, btn) {
+        document.getElementById(currentId).style.fontFamily = fontName;
+        document.querySelectorAll('.font-card').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function initColors() {
+        const grid = document.getElementById('colorGrid');
+        shinyGradients.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'color-circle';
+            div.style.background = c.bg;
+            div.title = c.name;
+            div.onclick = () => applyColor(c.bg, div);
+            grid.appendChild(div);
+        });
+    }
+
+    function applyColor(bg, btn) {
+        const el = document.getElementById(currentId);
+        el.style.backgroundImage = bg;
+        el.style.webkitBackgroundClip = 'text';
+        el.style.webkitTextFillColor = 'transparent';
+        el.style.color = 'transparent';
+        document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function initBackgrounds() {
+        const grid = document.getElementById('bgGrid');
+        backgrounds.forEach((src, index) => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.className = 'img-thumb';
+            img.onclick = () => changeBg(src, img);
+            grid.appendChild(img);
+        });
+    }
+
+    function changeBg(src, img) {
+        document.getElementById('card').style.backgroundImage = `url(${src})`;
+        document.querySelectorAll('.img-thumb').forEach(i => i.classList.remove('active'));
+        if(img) img.classList.add('active');
+    }
+
+    function uploadBg(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('card').style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function downloadCard() {
+        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('selected'));
+        html2canvas(document.getElementById('captureArea'), { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'دعوة-احترافية.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            selectText(currentId);
+        });
+    }
 </script>
 
 </body>
