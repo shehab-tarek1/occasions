@@ -3,113 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مصمم دعوات برو V14 - النسخة الرسمية</title>
+    <title>مصمم دعوات برو V21 - النسخة المتكاملة</title>
     
-    <!-- الخطوط -->
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@700&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&family=Cairo:wght@700&family=Changa:wght@700&family=El+Messiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@700&family=Lateef:wght@700&family=Lemonada:wght@700&family=Mada:wght@700&family=Noto+Kufi+Arabic:wght@700&family=Noto+Naskh+Arabic:wght@700&family=Reem+Kufi:wght@700&family=Scheherazade+New:wght@700&family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
-    :root {
-        --primary: #d4af37;
-        --bg-dark: #121212;
-        --panel-bg: #1e1e1e;
-        --border: #333;
-    }
-
+    :root { --primary: #d4af37; --bg-dark: #121212; --panel-bg: #1e1e1e; --border: #333; }
     body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Cairo', sans-serif; overflow-x: hidden; touch-action: pan-y; padding-bottom: 80px; }
-
     .app-container { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 15px; }
 
     /* --- المعاينة --- */
     .preview-section { display: flex; justify-content: center; position: relative; z-index: 5; margin-bottom: 10px; }
-    
-    #captureArea { 
-        width: 100%; 
-        max-width: 400px; 
-        border-radius: 15px; 
-        overflow: hidden; 
-        position: relative; 
-        box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
-        border: 2px solid #333;
-        touch-action: none;
-    }
-    
+    #captureArea { width: 100%; max-width: 400px; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.6); border: 2px solid #333; touch-action: none; }
     .main-card { width: 100%; aspect-ratio: 1/1.414; background-size: cover; background-position: center; position: relative; overflow: hidden; transition: all 0.5s ease; }
-    
-    /* الطبقة الشفافة/الزجاجية */
-    .overlay-layer { 
-        position: absolute; 
-        inset: 0; 
-        pointer-events: none; 
-        transition: all 0.3s ease;
-        background: rgba(0,0,0,0.3);
-    }
-    
-    /* تحسين الزجاج: تقليل البياض وزيادة التغبيش */
-    .overlay-layer.glass {
-        background: rgba(255,255,255,0.05); /* شفافية عالية جداً */
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        border: 1px solid rgba(255,255,255,0.1);
-    }
+    .overlay-layer { position: absolute; inset: 0; pointer-events: none; transition: all 0.3s ease; background: rgba(0,0,0,0.3); }
+    .overlay-layer.glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
 
     /* --- النصوص --- */
     .editable-text {
-        position: absolute;
-        padding: 5px 10px;
-        user-select: none;
-        -webkit-user-select: none;
-        cursor: grab;
-        white-space: nowrap;
-        text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        border: 1px solid transparent;
-        z-index: 10;
-        transition: font-size 0.3s, color 0.3s;
+        position: absolute; padding: 5px; user-select: none; -webkit-user-select: none; cursor: grab; z-index: 10;
+        box-sizing: border-box; text-align: center; min-width: 50px; background-color: transparent; border: 0px solid transparent;
+        display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
     }
-
-    .editable-text.selected { border: 1px dashed rgba(255,255,255,0.7); background: rgba(0,0,0,0.2); border-radius: 8px; }
-    .editable-text.dragging { border: 2px solid var(--primary); background: rgba(212, 175, 55, 0.2); cursor: grabbing; z-index: 100; }
+    .editable-text span { position: relative; z-index: 2; white-space: nowrap; pointer-events: none; }
+    .editable-text.selected { outline: 2px dashed rgba(255,255,255,0.8); outline-offset: 4px; }
+    .editable-text.dragging { outline: 2px solid var(--primary); cursor: grabbing; z-index: 100; }
 
     /* --- التحكم --- */
     .controls-section { display: flex; flex-direction: column; gap: 15px; }
     .panel { background: var(--panel-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); }
     .panel-title { font-size: 0.95rem; color: var(--primary); margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 8px; }
 
-    /* أزرار النماذج */
     .templates-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 10px; }
-    .tpl-btn { background: #333; color: #fff; border: 1px solid #444; padding: 10px 5px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    .tpl-btn i { font-size: 1.2rem; color: var(--primary); }
-    .tpl-btn:hover, .tpl-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
-    .tpl-btn.active i { color: #000; }
+    .tpl-btn { background: #333; color: #fff; border: 1px solid #444; padding: 10px 5px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.3s; }
+    .tpl-btn:hover, .tpl-btn.active { background: var(--primary); color: #000; border-color: var(--primary); transform: translateY(-3px); }
 
-    /* التحكم في الطبقة */
-    .overlay-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-    .toggle-btn { background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
+    .slider-container { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .range-slider { flex: 1; height: 5px; -webkit-appearance: none; background: #444; border-radius: 5px; outline: none; }
-    .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; background: var(--primary); border-radius: 50%; cursor: pointer; }
+    .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
+    .toggle-btn { background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
 
-    /* العناصر الأخرى */
     .target-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
     .target-btn { background: #2a2a2a; color: #ccc; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.2s; }
     .target-btn.active { background: var(--primary); color: #000; font-weight: bold; transform: scale(1.05); }
 
     .input-box { width: 100%; background: #2a2a2a; border: 1px solid #444; padding: 14px; border-radius: 10px; color: #fff; margin-top: 10px; font-size: 1rem; box-sizing: border-box; }
     
-    .grid-fonts { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; }
-    .font-card { background: #252525; border: 1px solid #333; border-radius: 8px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; }
+    .grid-fonts { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-height: 150px; overflow-y: auto; }
+    .font-card { background: #252525; border: 1px solid #333; border-radius: 8px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; font-size: 0.9rem; }
     .font-card.active { border: 2px solid var(--primary); background: #1a1a1a; color: var(--primary); }
 
-    .grid-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 12px; }
-    .color-circle { aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 2px solid #444; transition: transform 0.2s; position: relative; }
-    .color-circle.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    .grid-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 10px; }
+    .color-circle { aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 2px solid #444; position: relative; }
+    .color-circle.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); z-index: 2; }
+
+    .grid-shapes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .shape-btn { aspect-ratio: 1; background: #333; border: 1px solid #555; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #aaa; transition: 0.2s; }
+    .shape-btn.active { background: var(--primary); color: #000; border-color: #fff; }
 
     .grid-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
     .img-thumb { width: 100%; aspect-ratio: 1; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
     .img-thumb.active { border-color: var(--primary); opacity: 0.8; transform: scale(0.95); }
 
-    .save-btn { width: 100%; background: linear-gradient(45deg, #d4af37, #f7ef8a); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+    .mode-switcher { display: flex; background: #252525; padding: 5px; border-radius: 10px; margin-bottom: 10px; }
+    .mode-btn { flex: 1; padding: 8px; text-align: center; cursor: pointer; border-radius: 8px; font-size: 0.9rem; color: #aaa; transition: 0.2s; }
+    .mode-btn.active { background: var(--primary); color: #000; font-weight: bold; }
+
+    .action-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .remove-btn { flex: 1; background: #442222; color: #ff9999; border: 1px solid #553333; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
+    .remove-btn:hover { background: #662222; }
+    
+    .add-text-btn { width: 100%; background: #333; color: #fff; border: 1px dashed #777; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+    .add-text-btn:hover { background: #444; border-color: #fff; }
+
+    .main-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .save-btn { flex: 2; background: linear-gradient(45deg, #d4af37, #f7ef8a); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+    .share-btn { flex: 1; background: #333; color: #fff; border: 1px solid #555; border-radius: 12px; cursor: pointer; font-size: 1.2rem; }
+
+    /* --- نافذة الحفظ (Modal) --- */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-content { background: #1e1e1e; padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; border: 1px solid var(--primary); text-align: center; }
+    .modal-header { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 20px; }
+    .modal-option { margin-bottom: 15px; text-align: right; }
+    .modal-label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.9rem; }
+    .radio-group { display: flex; gap: 10px; }
+    .radio-label { flex: 1; background: #333; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; border: 1px solid transparent; }
+    .radio-label.selected { background: var(--primary); color: #000; font-weight: bold; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-confirm { flex: 1; background: var(--primary); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-cancel { flex: 1; background: #333; color: #fff; border: none; padding: 12px; border-radius: 8px; cursor: pointer; }
 
     @media (min-width: 900px) {
         .app-container { flex-direction: row; align-items: flex-start; }
@@ -123,16 +107,14 @@
 <div class="app-container">
     <div class="preview-section">
         <div id="captureArea">
-            <div id="card" class="main-card" style="background-image: url('https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80')">
-                <!-- طبقة الظل/الزجاج -->
+            <div id="card" class="main-card" style="background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80')">
                 <div id="cardOverlay" class="overlay-layer"></div>
-                
-                <div class="content">
-                    <div id="outIntro" class="editable-text" style="top: 15%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">نتشرف بدعوتكم</div>
-                    <div id="outNames" class="editable-text" style="top: 30%; left: 50%; transform: translate(-50%, 0); font-family: 'Amiri', serif; font-size: 2.5rem; font-weight: bold;">أحمد & سارة</div>
-                    <div id="outDate" class="editable-text" style="top: 55%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">الجمعة، 15 أكتوبر 2026</div>
-                    <div id="outLoc" class="editable-text" style="top: 65%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">قاعة الماسة الملكية</div>
-                    <div id="outInv" class="editable-text" style="top: 85%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif;">الداعي: عائلة محمد</div>
+                <div class="content" id="cardContent">
+                    <div id="outIntro" class="editable-text" style="top: 15%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif; font-size: 1.2rem;"><span>نتشرف بدعوتكم</span></div>
+                    <div id="outNames" class="editable-text" style="top: 30%; left: 50%; transform: translate(-50%, 0); font-family: 'Amiri', serif; font-size: 2.5rem; font-weight: bold;"><span>أحمد & سارة</span></div>
+                    <div id="outDate" class="editable-text" style="top: 55%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif; font-size: 1.1rem;"><span>الجمعة، 15 أكتوبر 2026</span></div>
+                    <div id="outLoc" class="editable-text" style="top: 65%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif; font-size: 1rem;"><span>قاعة الماسة الملكية</span></div>
+                    <div id="outInv" class="editable-text" style="top: 85%; left: 50%; transform: translate(-50%, 0); font-family: 'Cairo', sans-serif; font-size: 0.9rem;"><span>الداعي: عائلة محمد</span></div>
                 </div>
             </div>
         </div>
@@ -140,55 +122,106 @@
 
     <div class="controls-section">
         
-        <!-- قسم النماذج الجاهزة -->
+        <!-- النماذج -->
         <div class="panel">
-            <div class="panel-title"><i class="fas fa-layer-group"></i> 5 نماذج تصميم جاهزة</div>
+            <div class="panel-title"><i class="fas fa-magic"></i> 5 نماذج تصميم عصرية</div>
             <div class="templates-grid">
-                <button class="tpl-btn active" onclick="applyTemplate(0)"><i class="fas fa-star"></i> كلاسيك</button>
-                <button class="tpl-btn" onclick="applyTemplate(1)"><i class="fas fa-gem"></i> فخامة</button>
-                <button class="tpl-btn" onclick="applyTemplate(2)"><i class="fas fa-leaf"></i> مودرن</button>
-                <button class="tpl-btn" onclick="applyTemplate(3)"><i class="fas fa-moon"></i> ليلي</button>
-                <button class="tpl-btn" onclick="applyTemplate(4)"><i class="fas fa-heart"></i> رومانسي</button>
+                <button class="tpl-btn active" onclick="applyTemplate(0)"><i class="fas fa-crown"></i> ملكي</button>
+                <button class="tpl-btn" onclick="applyTemplate(1)"><i class="fas fa-leaf"></i> بوهيمي</button>
+                <button class="tpl-btn" onclick="applyTemplate(2)"><i class="fas fa-bolt"></i> نيون</button>
+                <button class="tpl-btn" onclick="applyTemplate(3)"><i class="fas fa-gem"></i> مودرن</button>
+                <button class="tpl-btn" onclick="applyTemplate(4)"><i class="fas fa-mosque"></i> إسلامي</button>
             </div>
         </div>
 
-        <!-- التحكم في الطبقة -->
+        <!-- الطبقة -->
         <div class="panel">
             <div class="panel-title">
-                <span><i class="fas fa-adjust"></i> تأثير الخلفية (ظل / زجاج)</span>
+                <span><i class="fas fa-adjust"></i> تأثير الخلفية</span>
                 <button class="toggle-btn" onclick="toggleOverlayMode()" id="overlayToggleBtn">وضع الظلام</button>
             </div>
-            <div class="overlay-controls">
+            <div class="slider-container">
                 <i class="fas fa-eye-slash" style="font-size:0.8rem; color:#777;"></i>
                 <input type="range" min="0" max="100" value="30" class="range-slider" id="overlaySlider" oninput="updateOverlay()">
                 <i class="fas fa-eye" style="font-size:0.8rem; color:#fff;"></i>
             </div>
         </div>
 
+        <!-- المحتوى والخط (تم التحديث) -->
         <div class="panel">
-            <div class="panel-title"><i class="fas fa-pen"></i> المحتوى (اضغط مطولاً للتحريك)</div>
-            <div class="target-scroll">
-                <button class="target-btn active" onclick="selectText('outIntro')">المقدمة</button>
-                <button class="target-btn" onclick="selectText('outNames')">الأسماء</button>
-                <button class="target-btn" onclick="selectText('outDate')">التاريخ</button>
-                <button class="target-btn" onclick="selectText('outLoc')">الموقع</button>
-                <button class="target-btn" onclick="selectText('outInv')">الداعي</button>
+            <div class="panel-title"><i class="fas fa-pen"></i> المحتوى والخط</div>
+            <div class="target-scroll" id="textSelectorContainer">
+                <!-- سيتم ملؤها ديناميكياً -->
             </div>
+            
+            <!-- أزرار الإضافة والحذف -->
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <button class="add-text-btn" onclick="addNewText()"><i class="fas fa-plus"></i> إضافة نص جديد</button>
+                <button class="remove-btn" onclick="deleteSelectedText()" style="width:auto;"><i class="fas fa-trash"></i> حذف المحدد</button>
+            </div>
+
             <input type="text" id="mainInput" class="input-box" placeholder="اكتب النص هنا..." oninput="updateText(this.value)">
+            
+            <div style="margin-top: 15px;">
+                <label style="font-size: 0.9rem; color: var(--primary); display:block; margin-bottom:5px;"><i class="fas fa-text-height"></i> حجم الخط:</label>
+                <div class="slider-container">
+                    <i class="fas fa-minus" style="font-size:0.8rem;"></i>
+                    <input type="range" min="0.5" max="5.0" step="0.1" value="1.2" class="range-slider" id="fontSizeSlider" oninput="updateFontSize(this.value)">
+                    <i class="fas fa-plus" style="font-size:0.8rem;"></i>
+                </div>
+            </div>
+            
+            <div style="margin-top:10px;">
+                <label style="font-size:0.8rem; color:#aaa; margin-bottom:5px; display:block;">نوع الخط</label>
+                <div class="grid-fonts" id="fontGrid"></div>
+            </div>
+            
+            <div style="margin-top:10px;">
+                <label style="font-size:0.8rem; color:#aaa; margin-bottom:5px; display:block;">لون النص</label>
+                <div class="grid-colors" id="textColorGrid"></div>
+            </div>
         </div>
 
+        <!-- خلفية النص والإطار -->
         <div class="panel">
-            <div class="panel-title"><i class="fas fa-font"></i> نوع الخط</div>
-            <div class="grid-fonts" id="fontGrid"></div>
+            <div class="panel-title"><i class="fas fa-vector-square"></i> خلفية النص والإطار</div>
+            
+            <label style="font-size:0.8rem; color:var(--primary); display:block; margin-bottom:5px;">1. شكل الخلفية</label>
+            <div class="grid-shapes" id="shapeGrid"></div>
+
+            <label style="font-size:0.8rem; color:var(--primary); display:block; margin:15px 0 5px;">2. اختر ماذا تلون:</label>
+            <div class="mode-switcher">
+                <div class="mode-btn active" id="modeBg" onclick="setPaintMode('bg')">لون الخلفية (Fill)</div>
+                <div class="mode-btn" id="modeBorder" onclick="setPaintMode('border')">لون الإطار (Stroke)</div>
+            </div>
+
+            <div class="action-row">
+                <button class="remove-btn" onclick="removeBoxBackground()"><i class="fas fa-times"></i> بدون خلفية</button>
+                <button class="remove-btn" onclick="removeBoxBorder()"><i class="fas fa-times"></i> بدون إطار</button>
+            </div>
+
+            <div class="grid-colors" id="frameColorGrid"></div>
+
+            <div id="bgOpacityControl" style="margin-top: 10px;">
+                <label style="font-size:0.8rem; color:#aaa;">شفافية لون الخلفية</label>
+                <div class="slider-container">
+                    <i class="fas fa-adjust" style="font-size:0.8rem; color:#777;"></i>
+                    <input type="range" min="0" max="100" value="100" class="range-slider" id="bgOpacitySlider" oninput="updateBgOpacity(this.value)">
+                </div>
+            </div>
+
+            <label style="font-size:0.8rem; color:var(--primary); display:block; margin:15px 0 5px;">3. نمط الإطار</label>
+            <div class="grid-shapes" id="borderStyleGrid" style="grid-template-columns: repeat(4, 1fr);"></div>
+
+            <div style="margin-top: 10px;">
+                <label style="font-size:0.8rem; color:#aaa;">مسافة الحشو (Padding)</label>
+                <input type="range" min="0" max="50" value="5" class="range-slider" id="paddingSlider" oninput="updatePadding(this.value)">
+            </div>
         </div>
 
+        <!-- الخلفيات -->
         <div class="panel">
-            <div class="panel-title"><i class="fas fa-palette"></i> 20 لون رسمي ولامع</div>
-            <div class="grid-colors" id="colorGrid"></div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-title"><i class="fas fa-image"></i> 15 خلفية محدثة</div>
+            <div class="panel-title"><i class="fas fa-image"></i> 15 خلفية</div>
             <div class="grid-images" id="bgGrid"></div>
             <label class="target-btn" style="display:block; text-align:center; margin-top:10px; width:auto; background:#333;">
                 <i class="fas fa-upload"></i> رفع صورة خاصة
@@ -196,35 +229,62 @@
             </label>
         </div>
 
-        <button class="save-btn" onclick="downloadCard()">
-            <i class="fas fa-download"></i> حفظ التصميم
-        </button>
+        <div class="main-actions">
+            <button class="save-btn" onclick="openSaveModal()"><i class="fas fa-download"></i> حفظ التصميم</button>
+            <button class="share-btn" onclick="shareDesign()"><i class="fas fa-share-alt"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة الحفظ المنبثقة -->
+<div id="saveModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">خيارات الحفظ</div>
+        
+        <div class="modal-option">
+            <label class="modal-label">صيغة الصورة</label>
+            <div class="radio-group">
+                <div class="radio-label selected" onclick="selectFormat('png', this)">PNG (جودة)</div>
+                <div class="radio-label" onclick="selectFormat('jpg', this)">JPG (خفيف)</div>
+            </div>
+        </div>
+
+        <div class="modal-option">
+            <label class="modal-label">الدقة والحجم</label>
+            <div class="radio-group">
+                <div class="radio-label" onclick="selectQuality(1, this)">1x</div>
+                <div class="radio-label selected" onclick="selectQuality(2, this)">2x (HD)</div>
+                <div class="radio-label" onclick="selectQuality(4, this)">4x (Ultra)</div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeSaveModal()">إلغاء</button>
+            <button class="btn-confirm" onclick="finalDownload()">تنزيل الآن</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- 1. البيانات ---
-    
-    // تم تحديث الروابط التالفة بروابط Unsplash مضمونة
+    // --- البيانات ---
     const backgrounds = [
-        'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80', // 1. تجريدي غامق
-        'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80', // 2. حفلة ليلية
-        'https://images.unsplash.com/photo-1507915977619-6ccfe8003ae6?auto=format&fit=crop&w=600&q=80', // 3. ذهبي
-        'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=600&q=80', // 4. رخام أبيض (جديد)
-        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80', // 5. زفاف كلاسيك
-        'https://images.unsplash.com/photo-1596627689623-644b93af8848?auto=format&fit=crop&w=600&q=80', // 6. إسلامي/فوانيس (جديد)
-        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80', // 7. موسيقى
-        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=600&q=80', // 8. ورد زهري
-        'https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=600&q=80', // 9. بيج هادئ
-        'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=600&q=80', // 10. خواتم
-        'https://images.unsplash.com/photo-1532323544230-7191fd51bc1b?auto=format&fit=crop&w=600&q=80', // 11. بوكيه
-        'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80', // 12. كحلي ملكي (جديد)
-        'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=600&q=80', // 13. سماء ليلية (جديد)
-        'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80', // 14. خشب داكن (جديد)
-        'https://images.unsplash.com/photo-1544194216-7c3ee7408468?auto=format&fit=crop&w=600&q=80'  // 15. إضاءة بوكيه (جديد)
+        'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1507915977619-6ccfe8003ae6?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1591604129939-f1efa4d4f73d?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1532323544230-7191fd51bc1b?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80'
     ];
 
-    // ألوان لامعة + 5 ألوان رسمية جديدة
     const shinyGradients = [
         { bg: 'linear-gradient(45deg, #FFD700, #FFFACD, #DAA520)', name: 'ذهب خالص' },
         { bg: 'linear-gradient(45deg, #C0C0C0, #FFFFFF, #A9A9A9)', name: 'فضة لامعة' },
@@ -241,89 +301,67 @@
         { bg: 'linear-gradient(45deg, #f12711, #f5af19, #f12711)', name: 'نار' },
         { bg: 'linear-gradient(45deg, #00c6ff, #0072ff, #00c6ff)', name: 'توباز أزرق' },
         { bg: 'linear-gradient(45deg, #D3CCE3, #E9E4F0, #D3CCE3)', name: 'بلاتينيوم' },
-        // الألوان الـ 5 الرسمية الجديدة
-        { bg: 'linear-gradient(to right, #F7E7CE, #E6D2B5)', name: 'شامبانيا' }, // 16
-        { bg: 'linear-gradient(to right, #141E30, #243B55)', name: 'كحلي دبلوماسي' }, // 17
-        { bg: 'linear-gradient(to right, #2C3E50, #4CA1AF)', name: 'رمادي رسمي' }, // 18
-        { bg: 'linear-gradient(to right, #40010D, #6E021B)', name: 'عنابي ملكي' }, // 19
-        { bg: 'linear-gradient(to right, #1D2B16, #3C5A2E)', name: 'زيتي غامق' } // 20
+        { bg: 'linear-gradient(to right, #F7E7CE, #E6D2B5)', name: 'شامبانيا' },
+        { bg: 'linear-gradient(to right, #141E30, #243B55)', name: 'كحلي دبلوماسي' },
+        { bg: 'linear-gradient(to right, #2C3E50, #4CA1AF)', name: 'رمادي رسمي' },
+        { bg: 'linear-gradient(to right, #40010D, #6E021B)', name: 'عنابي ملكي' },
+        { bg: 'linear-gradient(to right, #1D2B16, #3C5A2E)', name: 'زيتي غامق' },
+        { bg: 'linear-gradient(to right, #00f260, #0575e6)', name: 'أخضر نيون' },
+        { bg: 'linear-gradient(to right, #8360c3, #2ebf91)', name: 'بنفسجي أخضر' },
+        { bg: 'linear-gradient(to right, #ec008c, #fc6767)', name: 'غروب وردي' },
+        { bg: 'linear-gradient(to right, #1e3c72, #2a5298)', name: 'أزرق محيطي' },
+        { bg: 'linear-gradient(to right, #eacda3, #d6ae7b)', name: 'بيج صحراوي' },
+        { bg: 'linear-gradient(to right, #4568dc, #b06ab3)', name: 'توت بري' },
+        { bg: 'linear-gradient(to right, #ff9966, #ff5e62)', name: 'برتقالي حيوي' },
+        { bg: 'linear-gradient(to right, #000428, #004e92)', name: 'ليلة زرقاء' },
+        { bg: 'linear-gradient(to right, #ddd6f3, #faaca8)', name: 'حلوى القطن' },
+        { bg: 'linear-gradient(to right, #1c92d2, #f2fcfe)', name: 'سماوي صافي' }
+    ];
+
+    const shapes = [
+        { name: 'مربع', radius: '0px' }, { name: 'دائري', radius: '50px' }, { name: 'حواف ناعمة', radius: '10px' },
+        { name: 'كبسولة', radius: '999px' }, { name: 'ورقة 1', radius: '20px 0 20px 0' }, { name: 'ورقة 2', radius: '0 20px 0 20px' },
+        { name: 'بيضاوي', radius: '50% / 100%' }, { name: 'مشطوف', radius: '15px 50px 15px 50px' }, { name: 'قوس علوي', radius: '20px 20px 0 0' },
+        { name: 'قوس سفلي', radius: '0 0 20px 20px' }, { name: 'نصف دائرة', radius: '50px 50px 0 0' }, { name: 'قطرة', radius: '0 50% 50% 50%' },
+        { name: 'رسالة', radius: '10px 10px 10px 0' }, { name: 'بطاقة', radius: '5px' }, { name: 'بدون', radius: '0' }
+    ];
+
+    const borderStyles = [
+        { name: 'بدون', style: 'none', width: '0' }, { name: 'متصل', style: 'solid', width: '2px' }, { name: 'سميك', style: 'solid', width: '4px' },
+        { name: 'منقط', style: 'dotted', width: '3px' }, { name: 'متقطع', style: 'dashed', width: '2px' }, { name: 'مزدوج', style: 'double', width: '4px' },
+        { name: 'محفور', style: 'groove', width: '3px' }, { name: 'بارز', style: 'ridge', width: '3px' }, { name: 'داخل', style: 'inset', width: '3px' },
+        { name: 'خارج', style: 'outset', width: '3px' }, { name: 'علوي فقط', style: 'solid', width: '0 0 2px 0' }, { name: 'سفلي فقط', style: 'solid', width: '0 0 2px 0' },
+        { name: 'جانبي', style: 'solid', width: '0 2px 0 2px' }, { name: 'خفيف', style: 'solid', width: '1px' }, { name: 'عريض', style: 'solid', width: '6px' }
+    ];
+
+    const frameColors = [
+        '#ffffff', '#000000', '#d4af37', '#C0C0C0', 
+        '#800000', '#1a2a6c', '#134e5e', '#5614b0', 
+        '#e0c3fc', '#ff9a9e', '#fcf6ba', '#444444',
+        '#F0F8FF', '#FAEBD7', '#7FFFD4', 
+        '#DC143C', '#FF1493', '#FFD700', 
+        '#4B0082', '#F0E68C', '#E6E6FA', 
+        '#20B2AA', '#778899', '#B0C4DE', 
+        '#FF4500'
     ];
 
     const fontsList = [
-        { name: 'كايرو', font: "'Cairo', sans-serif" },
-        { name: 'أميري', font: "'Amiri', serif" },
-        { name: 'رقعة', font: "'Aref Ruqaa', serif" },
-        { name: 'كوفي', font: "'Reem Kufi', sans-serif" },
-        { name: 'تجوال', font: "'Tajawal', sans-serif" },
-        { name: 'المراعي', font: "'Almarai', sans-serif" },
-        { name: 'تشانجا', font: "'Changa', sans-serif" },
-        { name: 'المسيري', font: "'El Messiri', sans-serif" },
-        { name: 'نسخ حديث', font: "'IBM Plex Sans Arabic', sans-serif" },
-        { name: 'لطيف', font: "'Lateef', serif" },
-        { name: 'ليمونادة', font: "'Lemonada', cursive" },
-        { name: 'مدى', font: "'Mada', sans-serif" },
-        { name: 'كوفي عريض', font: "'Noto Kufi Arabic', sans-serif" },
-        { name: 'نسخ', font: "'Noto Naskh Arabic', serif" },
+        { name: 'كايرو', font: "'Cairo', sans-serif" }, { name: 'أميري', font: "'Amiri', serif" },
+        { name: 'رقعة', font: "'Aref Ruqaa', serif" }, { name: 'كوفي', font: "'Reem Kufi', sans-serif" },
+        { name: 'تجوال', font: "'Tajawal', sans-serif" }, { name: 'المراعي', font: "'Almarai', sans-serif" },
+        { name: 'تشانجا', font: "'Changa', sans-serif" }, { name: 'المسيري', font: "'El Messiri', sans-serif" },
+        { name: 'نسخ حديث', font: "'IBM Plex Sans Arabic', sans-serif" }, { name: 'لطيف', font: "'Lateef', serif" },
+        { name: 'ليمونادة', font: "'Lemonada', cursive" }, { name: 'مدى', font: "'Mada', sans-serif" },
+        { name: 'كوفي عريض', font: "'Noto Kufi Arabic', sans-serif" }, { name: 'نسخ', font: "'Noto Naskh Arabic', serif" },
         { name: 'شهرزاد', font: "'Scheherazade New', serif" }
     ];
 
-    // --- 2. النماذج الجاهزة (Templates) ---
     const templates = [
-        { // 0: كلاسيك
-            bgIndex: 4, 
-            overlay: { mode: 'dark', opacity: 20 },
-            positions: {
-                outIntro: { top: '15%', left: '50%', font: "'Cairo', sans-serif" },
-                outNames: { top: '30%', left: '50%', font: "'Amiri', serif" },
-                outDate: { top: '55%', left: '50%' },
-                outLoc: { top: '65%', left: '50%' },
-                outInv: { top: '85%', left: '50%' }
-            }
-        },
-        { // 1: فخامة
-            bgIndex: 0, 
-            overlay: { mode: 'dark', opacity: 60 },
-            positions: {
-                outIntro: { top: '10%', left: '50%' },
-                outNames: { top: '40%', left: '50%', font: "'Aref Ruqaa', serif" },
-                outDate: { top: '70%', left: '50%' },
-                outLoc: { top: '80%', left: '50%' },
-                outInv: { top: '90%', left: '50%' }
-            }
-        },
-        { // 2: مودرن (تم تحديث الخلفية لـ رخام جديد)
-            bgIndex: 3, 
-            overlay: { mode: 'glass', opacity: 30 },
-            positions: {
-                outIntro: { top: '20%', left: '80%' },
-                outNames: { top: '35%', left: '50%', font: "'Cairo', sans-serif" },
-                outDate: { top: '50%', left: '50%' },
-                outLoc: { top: '60%', left: '50%' },
-                outInv: { top: '80%', left: '50%' }
-            }
-        },
-        { // 3: ليلي
-            bgIndex: 1, 
-            overlay: { mode: 'dark', opacity: 50 },
-            positions: {
-                outIntro: { top: '10%', left: '50%' },
-                outNames: { top: '25%', left: '50%', font: "'Reem Kufi', sans-serif" },
-                outDate: { top: '80%', left: '50%' },
-                outLoc: { top: '88%', left: '50%' },
-                outInv: { top: '50%', left: '50%' }
-            }
-        },
-        { // 4: رومانسي
-            bgIndex: 7, 
-            overlay: { mode: 'glass', opacity: 40 },
-            positions: {
-                outIntro: { top: '30%', left: '50%' },
-                outNames: { top: '45%', left: '50%', font: "'Lemonada', cursive" },
-                outDate: { top: '60%', left: '50%' },
-                outLoc: { top: '70%', left: '50%' },
-                outInv: { top: '85%', left: '50%' }
-            }
-        }
+        { bgIndex: 11, overlay: { mode: 'dark', opacity: 30 }, styles: { outIntro: { top: '15%', left: '50%', font: "'Amiri', serif", color: shinyGradients[0].bg, border: {style:'double', width:'4px', color:'#d4af37'}, bg:'rgba(0,0,0,0.5)', shape:'10px' }, outNames: { top: '35%', left: '50%', font: "'Aref Ruqaa', serif", size: '3rem', color: shinyGradients[0].bg, border: {style:'none'}, bg:'transparent', shape:'0' }, outDate: { top: '60%', left: '50%', font: "'Cairo', sans-serif", color: '#fff', border: {style:'solid', width:'1px', color:'#d4af37'}, bg:'rgba(0,0,0,0.5)', shape:'5px' }, outLoc: { top: '70%', left: '50%', font: "'Cairo', sans-serif", color: '#fff', border: {style:'none'}, bg:'transparent', shape:'0' }, outInv: { top: '85%', left: '50%', font: "'Cairo', sans-serif", color: '#d4af37', border: {style:'none'}, bg:'transparent', shape:'0' } } },
+        { bgIndex: 13, overlay: { mode: 'dark', opacity: 20 }, styles: { outIntro: { top: '15%', left: '50%', font: "'Cairo', sans-serif", color: '#fff', border: {style:'none'}, bg:'transparent', shape:'0' }, outNames: { top: '35%', left: '50%', font: "'Lemonada', cursive", size: '2.5rem', color: '#fff', border: {style:'solid', width:'2px', color:'#fff'}, bg:'rgba(255,255,255,0.1)', shape:'20px 0 20px 0' }, outDate: { top: '60%', left: '50%', font: "'Cairo', sans-serif", color: '#eee', border: {style:'none'}, bg:'transparent', shape:'0' }, outLoc: { top: '70%', left: '50%', font: "'Cairo', sans-serif", color: '#eee', border: {style:'none'}, bg:'transparent', shape:'0' }, outInv: { top: '85%', left: '50%', font: "'Cairo', sans-serif", color: '#ccc', border: {style:'none'}, bg:'transparent', shape:'0' } } },
+        { bgIndex: 0, overlay: { mode: 'dark', opacity: 70 }, styles: { outIntro: { top: '15%', left: '50%', font: "'Tajawal', sans-serif", color: shinyGradients[20].bg, border: {style:'none'}, bg:'transparent', shape:'0' }, outNames: { top: '35%', left: '50%', font: "'Changa', sans-serif", size: '3rem', color: shinyGradients[22].bg, border: {style:'solid', width:'3px', color:'#ec008c'}, bg:'rgba(0,0,0,0.8)', shape:'0' }, outDate: { top: '60%', left: '50%', font: "'Tajawal', sans-serif", color: '#fff', border: {style:'dotted', width:'2px', color:'#00f260'}, bg:'transparent', shape:'50px' }, outLoc: { top: '70%', left: '50%', font: "'Tajawal', sans-serif", color: '#fff', border: {style:'none'}, bg:'transparent', shape:'0' }, outInv: { top: '85%', left: '50%', font: "'Tajawal', sans-serif", color: '#aaa', border: {style:'none'}, bg:'transparent', shape:'0' } } },
+        { bgIndex: 3, overlay: { mode: 'glass', opacity: 20 }, styles: { outIntro: { top: '20%', left: '50%', font: "'Almarai', sans-serif", color: '#333', border: {style:'none'}, bg:'transparent', shape:'0' }, outNames: { top: '35%', left: '50%', font: "'El Messiri', sans-serif", size: '2.5rem', color: '#000', border: {style:'solid', width:'1px', color:'#000'}, bg:'rgba(255,255,255,0.5)', shape:'999px' }, outDate: { top: '55%', left: '50%', font: "'Almarai', sans-serif", color: '#555', border: {style:'none'}, bg:'transparent', shape:'0' }, outLoc: { top: '65%', left: '50%', font: "'Almarai', sans-serif", color: '#555', border: {style:'none'}, bg:'transparent', shape:'0' }, outInv: { top: '85%', left: '50%', font: "'Almarai', sans-serif", color: '#777', border: {style:'none'}, bg:'transparent', shape:'0' } } },
+        { bgIndex: 5, overlay: { mode: 'dark', opacity: 30 }, styles: { outIntro: { top: '15%', left: '50%', font: "'Reem Kufi', sans-serif", color: '#fff', border: {style:'none'}, bg:'transparent', shape:'0' }, outNames: { top: '30%', left: '50%', font: "'Amiri', serif", size: '2.8rem', color: '#fff', border: {style:'double', width:'4px', color:'#fff'}, bg:'rgba(20, 50, 20, 0.6)', shape:'15px 50px 15px 50px' }, outDate: { top: '60%', left: '50%', font: "'Reem Kufi', sans-serif", color: '#eee', border: {style:'none'}, bg:'transparent', shape:'0' }, outLoc: { top: '70%', left: '50%', font: "'Reem Kufi', sans-serif", color: '#eee', border: {style:'none'}, bg:'transparent', shape:'0' }, outInv: { top: '85%', left: '50%', font: "'Reem Kufi', sans-serif", color: '#d4af37', border: {style:'none'}, bg:'transparent', shape:'0' } } }
     ];
 
     let currentId = 'outIntro';
@@ -331,15 +369,242 @@
     let isDragging = false;
     let shiftX = 0, shiftY = 0;
     let isGlassMode = false;
+    let paintMode = 'bg'; 
+    let currentBgColor = '#ffffff';
+    let saveFormat = 'png';
+    let saveScale = 2;
 
     window.onload = () => {
-        initFonts();
-        initColors();
-        initBackgrounds();
+        initUI();
         setupInteraction();
+        refreshTextList();
         selectText('outIntro');
         updateOverlay();
     };
+
+    function initUI() {
+        const fGrid = document.getElementById('fontGrid');
+        fontsList.forEach(f => {
+            const div = document.createElement('div'); div.className = 'font-card'; div.innerText = f.name; div.style.fontFamily = f.font;
+            div.onclick = () => applyFont(f.font, div); fGrid.appendChild(div);
+        });
+
+        const tGrid = document.getElementById('textColorGrid');
+        shinyGradients.forEach(c => {
+            const div = document.createElement('div'); div.className = 'color-circle'; div.style.background = c.bg;
+            div.onclick = () => applyTextColor(c.bg, div); tGrid.appendChild(div);
+        });
+
+        const fcGrid = document.getElementById('frameColorGrid');
+        frameColors.forEach(c => {
+            const div = document.createElement('div'); div.className = 'color-circle'; div.style.background = c;
+            div.onclick = () => applyBoxColor(c, div); fcGrid.appendChild(div);
+        });
+
+        const sGrid = document.getElementById('shapeGrid');
+        shapes.forEach(s => {
+            const btn = document.createElement('div'); btn.className = 'shape-btn'; btn.innerText = s.name; btn.style.borderRadius = s.radius;
+            btn.onclick = () => applyShape(s.radius, btn); sGrid.appendChild(btn);
+        });
+
+        const bGrid = document.getElementById('borderStyleGrid');
+        borderStyles.forEach(b => {
+            const btn = document.createElement('div'); btn.className = 'shape-btn'; btn.innerText = b.name; btn.style.border = `${b.width} ${b.style} #fff`;
+            btn.onclick = () => applyBorder(b, btn); bGrid.appendChild(btn);
+        });
+
+        const bgGrid = document.getElementById('bgGrid');
+        backgrounds.forEach(src => {
+            const img = document.createElement('img'); img.src = src; img.className = 'img-thumb';
+            img.onclick = () => changeBg(src, img); bgGrid.appendChild(img);
+        });
+    }
+
+    // --- إدارة النصوص (إضافة وحذف) ---
+    function refreshTextList() {
+        const container = document.getElementById('textSelectorContainer');
+        container.innerHTML = '';
+        document.querySelectorAll('.editable-text').forEach(el => {
+            const btn = document.createElement('button');
+            btn.className = 'target-btn';
+            if(el.id === currentId) btn.classList.add('active');
+            // نأخذ جزء من النص كعنوان للزر
+            let btnText = el.innerText.substring(0, 8);
+            if(el.innerText.length > 8) btnText += '..';
+            if(btnText.trim() === '') btnText = 'نص جديد';
+            
+            btn.innerText = btnText;
+            btn.onclick = () => selectText(el.id);
+            container.appendChild(btn);
+        });
+    }
+
+    function addNewText() {
+        const id = 'customText_' + Date.now();
+        const div = document.createElement('div');
+        div.className = 'editable-text';
+        div.id = id;
+        div.style.top = '50%';
+        div.style.left = '50%';
+        div.style.transform = 'translate(-50%, -50%)';
+        div.style.fontFamily = "'Cairo', sans-serif";
+        div.style.fontSize = '1.5rem';
+        div.innerHTML = '<span>نص جديد</span>';
+        
+        // إضافة مستمعي الأحداث للعنصر الجديد
+        div.addEventListener('touchstart', handleStart, {passive:false});
+        div.addEventListener('mousedown', handleStart);
+        
+        document.getElementById('cardContent').appendChild(div);
+        refreshTextList();
+        selectText(id);
+    }
+
+    function deleteSelectedText() {
+        if(document.querySelectorAll('.editable-text').length <= 1) {
+            alert("يجب أن يبقى نص واحد على الأقل!");
+            return;
+        }
+        const el = document.getElementById(currentId);
+        if(el) {
+            el.remove();
+            // تحديد عنصر آخر تلقائياً
+            const remaining = document.querySelector('.editable-text');
+            if(remaining) selectText(remaining.id);
+            refreshTextList();
+        }
+    }
+
+    // --- منطق التطبيق ---
+    function setPaintMode(mode) {
+        paintMode = mode;
+        document.getElementById('modeBg').classList.toggle('active', mode === 'bg');
+        document.getElementById('modeBorder').classList.toggle('active', mode === 'border');
+        document.getElementById('bgOpacityControl').style.display = (mode === 'bg') ? 'block' : 'none';
+    }
+
+    function applyTextColor(bg, btn) {
+        const el = document.querySelector(`#${currentId} span`);
+        el.style.backgroundImage = bg.includes('gradient') ? bg : 'none';
+        el.style.webkitBackgroundClip = bg.includes('gradient') ? 'text' : 'initial';
+        el.style.webkitTextFillColor = bg.includes('gradient') ? 'transparent' : 'initial';
+        el.style.color = bg.includes('gradient') ? 'transparent' : bg;
+        document.querySelectorAll('#textColorGrid .color-circle').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function applyBoxColor(color, btn) {
+        const el = document.getElementById(currentId);
+        if (paintMode === 'bg') {
+            currentBgColor = color;
+            updateBgOpacity(document.getElementById('bgOpacitySlider').value);
+        } else {
+            el.style.borderColor = color;
+        }
+        document.querySelectorAll('#frameColorGrid .color-circle').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function updateBgOpacity(opacityVal) {
+        const el = document.getElementById(currentId);
+        const alpha = opacityVal / 100;
+        let r = 0, g = 0, b = 0;
+        if (currentBgColor.startsWith('#')) {
+            if (currentBgColor.length === 4) {
+                r = parseInt(currentBgColor[1] + currentBgColor[1], 16);
+                g = parseInt(currentBgColor[2] + currentBgColor[2], 16);
+                b = parseInt(currentBgColor[3] + currentBgColor[3], 16);
+            } else if (currentBgColor.length === 7) {
+                r = parseInt(currentBgColor.substring(1, 3), 16);
+                g = parseInt(currentBgColor.substring(3, 5), 16);
+                b = parseInt(currentBgColor.substring(5, 7), 16);
+            }
+        }
+        el.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function removeBoxBackground() {
+        document.getElementById(currentId).style.backgroundColor = 'transparent';
+        currentBgColor = '#ffffff';
+    }
+
+    function removeBoxBorder() {
+        document.getElementById(currentId).style.border = 'none';
+    }
+
+    function applyShape(radius, btn) {
+        document.getElementById(currentId).style.borderRadius = radius;
+        document.querySelectorAll('#shapeGrid .shape-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function applyBorder(borderObj, btn) {
+        const el = document.getElementById(currentId);
+        const currentColor = el.style.borderColor || 'var(--primary)';
+        el.style.borderStyle = 'none';
+        
+        if (borderObj.name === 'علوي فقط') {
+            el.style.borderTopWidth = borderObj.width.split(' ')[2] || borderObj.width;
+            el.style.borderTopStyle = borderObj.style;
+            el.style.borderTopColor = currentColor;
+        }
+        else if (borderObj.name === 'سفلي فقط') {
+            el.style.borderBottomWidth = borderObj.width.split(' ')[2] || borderObj.width;
+            el.style.borderBottomStyle = borderObj.style;
+            el.style.borderBottomColor = currentColor;
+        }
+        else if (borderObj.name === 'جانبي') {
+            el.style.borderLeftWidth = borderObj.width.split(' ')[1] || borderObj.width;
+            el.style.borderLeftStyle = borderObj.style;
+            el.style.borderLeftColor = currentColor;
+            el.style.borderRightWidth = borderObj.width.split(' ')[1] || borderObj.width;
+            el.style.borderRightStyle = borderObj.style;
+            el.style.borderRightColor = currentColor;
+        }
+        else {
+            el.style.borderWidth = borderObj.width;
+            el.style.borderStyle = borderObj.style;
+            el.style.borderColor = currentColor;
+        }
+        document.querySelectorAll('#borderStyleGrid .shape-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function updatePadding(val) { document.getElementById(currentId).style.padding = val + 'px'; }
+    function updateFontSize(val) { document.getElementById(currentId).style.fontSize = val + 'rem'; }
+    function updateText(val) { 
+        document.querySelector(`#${currentId} span`).innerText = val; 
+        refreshTextList(); // تحديث اسم الزر
+    }
+    function applyFont(font, btn) { document.getElementById(currentId).style.fontFamily = font; }
+
+    function selectText(id) {
+        currentId = id;
+        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('selected'));
+        const el = document.getElementById(id);
+        el.classList.add('selected');
+        
+        // تحديث الأزرار في القائمة
+        refreshTextList();
+        
+        document.getElementById('mainInput').value = el.innerText;
+        const style = window.getComputedStyle(el);
+        document.getElementById('fontSizeSlider').value = (parseFloat(style.fontSize) / 16).toFixed(1);
+        document.getElementById('paddingSlider').value = parseFloat(style.padding) || 5;
+    }
+
+    function changeBg(src, img) { 
+        document.getElementById('card').style.backgroundImage = `url(${src})`; 
+        document.querySelectorAll('.img-thumb').forEach(i => i.classList.remove('active'));
+        if(img) img.classList.add('active');
+    }
+    function uploadBg(input) {
+        if (input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => document.getElementById('card').style.backgroundImage = `url(${e.target.result})`;
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
     function applyTemplate(index) {
         const tpl = templates[index];
@@ -349,208 +614,145 @@
         updateOverlayUI();
         updateOverlay();
 
-        for (const [key, val] of Object.entries(tpl.positions)) {
+        // تطبيق الاستايلات
+        for (const [key, style] of Object.entries(tpl.styles)) {
             const el = document.getElementById(key);
-            el.style.top = val.top;
-            el.style.left = val.left;
-            el.style.transform = 'translate(-50%, 0)'; 
-            if (val.font) el.style.fontFamily = val.font;
+            if(!el) continue; // في حال تم حذف عنصر
+            const span = el.querySelector('span');
+            
+            el.style.top = style.top;
+            el.style.left = style.left;
+            el.style.transform = 'translate(-50%, 0)';
+            
+            if(style.font) el.style.fontFamily = style.font;
+            if(style.size) el.style.fontSize = style.size;
+
+            if(style.color.includes('gradient')) {
+                span.style.backgroundImage = style.color;
+                span.style.webkitBackgroundClip = 'text';
+                span.style.webkitTextFillColor = 'transparent';
+            } else {
+                span.style.background = 'none';
+                span.style.webkitTextFillColor = 'initial';
+                span.style.color = style.color;
+            }
+
+            el.style.borderStyle = style.border.style;
+            if(style.border.style !== 'none') {
+                el.style.borderWidth = style.border.width;
+                el.style.borderColor = style.border.color;
+            }
+            el.style.backgroundColor = style.bg;
+            el.style.borderRadius = style.shape;
         }
+        selectText(currentId);
         document.querySelectorAll('.tpl-btn').forEach((b, i) => b.classList.toggle('active', i === index));
     }
 
-    function toggleOverlayMode() {
-        isGlassMode = !isGlassMode;
-        updateOverlayUI();
-        updateOverlay();
-    }
-
+    function toggleOverlayMode() { isGlassMode = !isGlassMode; updateOverlayUI(); updateOverlay(); }
     function updateOverlayUI() {
         const btn = document.getElementById('overlayToggleBtn');
         const layer = document.getElementById('cardOverlay');
-        
-        if (isGlassMode) {
-            btn.innerText = "وضع الزجاج";
-            btn.style.background = "#fff";
-            btn.style.color = "#000";
-            layer.classList.add('glass');
-        } else {
-            btn.innerText = "وضع الظلام";
-            btn.style.background = "#333";
-            btn.style.color = "#fff";
-            layer.classList.remove('glass');
-        }
+        if (isGlassMode) { btn.innerText = "وضع الزجاج"; btn.style.background = "#fff"; btn.style.color = "#000"; layer.classList.add('glass'); }
+        else { btn.innerText = "وضع الظلام"; btn.style.background = "#333"; btn.style.color = "#fff"; layer.classList.remove('glass'); }
     }
-
     function updateOverlay() {
         const opacity = document.getElementById('overlaySlider').value / 100;
         const layer = document.getElementById('cardOverlay');
-        
         if (isGlassMode) {
-            // تقليل البياض بشكل كبير (الحد الأقصى 0.15 بدلاً من 1)
             layer.style.backgroundColor = `rgba(255, 255, 255, ${opacity * 0.15})`;
-            // زيادة التغبيش كلما زادت الشفافية
             layer.style.backdropFilter = `blur(${opacity * 8}px)`;
             layer.style.webkitBackdropFilter = `blur(${opacity * 8}px)`;
         } else {
             layer.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
-            layer.style.backdropFilter = 'none';
-            layer.style.webkitBackdropFilter = 'none';
+            layer.style.backdropFilter = 'none'; layer.style.webkitBackdropFilter = 'none';
         }
     }
 
-    // --- التفاعل والتحريك ---
     function setupInteraction() {
         const texts = document.querySelectorAll('.editable-text');
-        texts.forEach(el => {
-            el.addEventListener('touchstart', handleStart, { passive: false });
-            el.addEventListener('mousedown', handleStart);
-        });
-        document.addEventListener('touchmove', handleMove, { passive: false });
-        document.addEventListener('touchend', handleEnd);
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('mouseup', handleEnd);
+        texts.forEach(el => { el.addEventListener('touchstart', handleStart, {passive:false}); el.addEventListener('mousedown', handleStart); });
+        document.addEventListener('touchmove', handleMove, {passive:false}); document.addEventListener('touchend', handleEnd);
+        document.addEventListener('mousemove', handleMove); document.addEventListener('mouseup', handleEnd);
     }
-
     function handleStart(e) {
-        const el = e.target;
-        if (!el.classList.contains('editable-text')) return;
+        const el = e.target.closest('.editable-text');
+        if (!el) return;
         selectText(el.id);
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
         dragTimer = setTimeout(() => {
-            isDragging = true;
-            el.classList.add('dragging');
-            if (navigator.vibrate) navigator.vibrate(50);
-            const rect = el.getBoundingClientRect();
-            shiftX = clientX - rect.left;
-            shiftY = clientY - rect.top;
+            isDragging = true; el.classList.add('dragging'); if(navigator.vibrate) navigator.vibrate(50);
+            const rect = el.getBoundingClientRect(); shiftX = clientX - rect.left; shiftY = clientY - rect.top;
         }, 600);
     }
-
     function handleMove(e) {
-        if (!isDragging) {
-            if(e.type === 'touchmove') clearTimeout(dragTimer);
-            return;
-        }
-        e.preventDefault();
-        const el = document.querySelector('.editable-text.dragging');
-        if (!el) return;
+        if (!isDragging) { if(e.type === 'touchmove') clearTimeout(dragTimer); return; }
+        e.preventDefault(); const el = document.querySelector('.editable-text.dragging'); if (!el) return;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const containerRect = document.getElementById('captureArea').getBoundingClientRect();
-        
-        let newLeft = clientX - containerRect.left - shiftX;
-        let newTop = clientY - containerRect.top - shiftY;
-        
-        el.style.left = newLeft + 'px';
-        el.style.top = newTop + 'px';
+        el.style.left = (clientX - containerRect.left - shiftX) + 'px';
+        el.style.top = (clientY - containerRect.top - shiftY) + 'px';
         el.style.transform = 'none';
     }
+    function handleEnd() { clearTimeout(dragTimer); if(isDragging) { isDragging = false; const el = document.querySelector('.editable-text.dragging'); if(el) el.classList.remove('dragging'); } }
 
-    function handleEnd() {
-        clearTimeout(dragTimer);
-        if (isDragging) {
-            isDragging = false;
-            const el = document.querySelector('.editable-text.dragging');
-            if (el) el.classList.remove('dragging');
-        }
+    // --- نافذة الحفظ والمشاركة ---
+    function openSaveModal() { document.getElementById('saveModal').style.display = 'flex'; }
+    function closeSaveModal() { document.getElementById('saveModal').style.display = 'none'; }
+    
+    function selectFormat(fmt, btn) {
+        saveFormat = fmt;
+        btn.parentElement.querySelectorAll('.radio-label').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+    
+    function selectQuality(scale, btn) {
+        saveScale = scale;
+        btn.parentElement.querySelectorAll('.radio-label').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
     }
 
-    // --- الوظائف المساعدة ---
-    function selectText(id) {
-        currentId = id;
+    function finalDownload() {
+        closeSaveModal();
         document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('selected'));
-        document.getElementById(id).classList.add('selected');
-        document.querySelectorAll('.target-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = Array.from(document.querySelectorAll('.target-btn')).find(b => b.getAttribute('onclick').includes(id));
-        if(activeBtn) activeBtn.classList.add('active');
-        document.getElementById('mainInput').value = document.getElementById(id).innerText;
-    }
-
-    function updateText(val) {
-        document.getElementById(currentId).innerText = val;
-    }
-
-    function initFonts() {
-        const grid = document.getElementById('fontGrid');
-        fontsList.forEach(f => {
-            const div = document.createElement('div');
-            div.className = 'font-card';
-            div.innerText = f.name;
-            div.style.fontFamily = f.font;
-            div.onclick = () => applyFont(f.font, div);
-            grid.appendChild(div);
-        });
-    }
-
-    function applyFont(fontName, btn) {
-        document.getElementById(currentId).style.fontFamily = fontName;
-        document.querySelectorAll('.font-card').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function initColors() {
-        const grid = document.getElementById('colorGrid');
-        shinyGradients.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'color-circle';
-            div.style.background = c.bg;
-            div.title = c.name;
-            div.onclick = () => applyColor(c.bg, div);
-            grid.appendChild(div);
-        });
-    }
-
-    function applyColor(bg, btn) {
-        const el = document.getElementById(currentId);
-        el.style.backgroundImage = bg;
-        el.style.webkitBackgroundClip = 'text';
-        el.style.webkitTextFillColor = 'transparent';
-        el.style.color = 'transparent';
-        document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function initBackgrounds() {
-        const grid = document.getElementById('bgGrid');
-        backgrounds.forEach((src, index) => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.className = 'img-thumb';
-            img.onclick = () => changeBg(src, img);
-            grid.appendChild(img);
-        });
-    }
-
-    function changeBg(src, img) {
-        document.getElementById('card').style.backgroundImage = `url(${src})`;
-        document.querySelectorAll('.img-thumb').forEach(i => i.classList.remove('active'));
-        if(img) img.classList.add('active');
-    }
-
-    function uploadBg(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('card').style.backgroundImage = `url(${e.target.result})`;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function downloadCard() {
-        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('selected'));
-        html2canvas(document.getElementById('captureArea'), { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+        
+        const type = saveFormat === 'png' ? 'image/png' : 'image/jpeg';
+        
+        html2canvas(document.getElementById('captureArea'), { scale: saveScale, useCORS: true, backgroundColor: null }).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'دعوة-احترافية.png';
-            link.href = canvas.toDataURL('image/png');
+            link.download = `design_${Date.now()}.${saveFormat}`;
+            link.href = canvas.toDataURL(type, saveFormat === 'jpg' ? 0.9 : 1.0);
             link.click();
             selectText(currentId);
         });
     }
-</script>
 
+    async function shareDesign() {
+        document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('selected'));
+        
+        try {
+            const canvas = await html2canvas(document.getElementById('captureArea'), { scale: 2, useCORS: true });
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "invite.png", { type: "image/png" });
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'تصميم دعوة',
+                        text: 'شاهد هذا التصميم الذي صنعته!',
+                        files: [file]
+                    });
+                } else {
+                    alert("المشاركة غير مدعومة في هذا المتصفح، سيتم حفظ الصورة بدلاً من ذلك.");
+                    finalDownload();
+                }
+            }, 'image/png');
+        } catch (error) {
+            console.error('Error sharing:', error);
+        }
+        
+        selectText(currentId);
+    }
+</script>
 </body>
 </html>
