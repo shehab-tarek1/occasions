@@ -1,6 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-
 module.exports = async (req, res) => {
     const p = req.query.p;
 
@@ -10,9 +7,9 @@ module.exports = async (req, res) => {
         return res.end();
     }
 
-    // فحص هل الزائر روبوت (واتساب/فيسبوك) أم مستخدم عادي
+    // فحص هل الزائر روبوت (واتساب/فيسبوك/إلخ) أم مستخدم عادي
     const userAgent = (req.headers['user-agent'] || '').toLowerCase();
-    const isBot = /whatsapp|facebook|twitter|telegram|linkedin|bot|crawler|spider|discord/i.test(userAgent);
+    const isBot = /whatsapp|facebook|twitter|telegram|linkedin|bot|crawler|spider|discord|viber|skype/i.test(userAgent);
 
     // 🔴 إذا كان مستخدم حقيقي، نقوم بتوجيهه للمتجر فوراً ليفتح المنتج
     if (!isBot) {
@@ -20,7 +17,7 @@ module.exports = async (req, res) => {
         return res.end();
     }
 
-    // 🟢 إذا كان روبوت واتساب، نجلب بيانات المنتج من Firebase
+    // 🟢 إذا كان روبوت، نجلب بيانات المنتج من Firebase
     const projectId = 'marketing-e9fdf';
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
 
@@ -30,7 +27,7 @@ module.exports = async (req, res) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 structuredQuery: {
-                    from:[{ collectionId: 'products' }],
+                    from: [{ collectionId: 'products' }],
                     where: {
                         fieldFilter: {
                             field: { fieldPath: 'shortCode' },
@@ -59,22 +56,24 @@ module.exports = async (req, res) => {
         const titleWithPrice = `${title}${formattedPrice ? ' | ' + formattedPrice : ''}`;
         const finalDesc = `🔖 كود المنتج: ${p}\n${desc}`;
 
+        // صورة افتراضية في حال عدم وجود صورة للمنتج
         let imageUrl = 'https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg'; 
+        
         if (fields.images?.arrayValue?.values?.length > 0) {
             imageUrl = fields.images.arrayValue.values[0].stringValue;
         } else if (fields.img?.stringValue) {
             imageUrl = fields.img.stringValue;
         }
 
-        // إجبار الصورة لتكون JPG ومربعة 600x600 للواتساب
+        // التعديل الجديد: إجبار الصورة لتكون JPG ومربعة 600x600 للواتساب بشكل آمن (Regex)
         if (imageUrl.includes('cloudinary.com')) {
-            const urlParts = imageUrl.split('/');
-            const fileId = urlParts.pop(); 
-            const version = urlParts.pop(); 
-            imageUrl = `https://res.cloudinary.com/dsxrjmcxs/image/upload/w_600,h_600,c_fill,q_80,f_jpg/${version}/${fileId}`;
+            imageUrl = imageUrl.replace(
+                /\/upload\/(?:[a-zA-Z0-9_,-]+\/)?/, 
+                '/upload/w_600,h_600,c_fill,q_80,f_jpg/'
+            );
         }
 
-        // إرسال صفحة مخصصة للواتساب فقط
+        // إرسال صفحة مخصصة للروبوتات تحتوي على بيانات الـ Meta tags فقط
         const botHtml = `
             <!DOCTYPE html>
             <html lang="ar" dir="rtl">
@@ -100,11 +99,14 @@ module.exports = async (req, res) => {
             </html>
         `;
 
+        // إعداد الهيدر مع الكاش لتحسين الأداء (SEO & Performance)
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800');
+        
         return res.status(200).send(botHtml);
 
     } catch (error) {
+        console.error("Error generating share preview:", error);
         res.writeHead(302, { Location: '/' });
         return res.end();
     }
