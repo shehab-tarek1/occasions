@@ -323,23 +323,32 @@
         }
 
         window.shareProduct = function(event, id) {
-            event.stopPropagation();
-            const p = window.products.find(x => x.id === id);
-            if(!p) return;
+    event.stopPropagation();
+    const p = window.products.find(x => x.id === id);
+    if(!p) return;
 
-            const baseUrl = window.location.href.split('?')[0].split('#')[0];
-            const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-const shareUrl = `${cleanBaseUrl}/p/${p.shortCode}`;            const shareTitle = `A&M Store | ${p.name}`;
-            const shareText = ` شاهد هذا المنتج الرائع من A&M Store!\n ${p.name}\n السعر: ${p.price} ج.م\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، اضغط على الرابط:\n`;
+    // الحصول على رابط الموقع (الدومين) الحالي
+    const domain = window.location.origin;
+    
+    // الرابط بصيغة /p/ لضمان سحب بيانات المعاينة من السيرفر
+    const shareUrl = `${domain}/p/${p.shortCode}`;
+    
+    // نص مختصر جداً لأن المعاينة ستكفّل بإظهار (الاسم، السعر، الكود، والصورة)
+    const shareText = `شاهد هذا المنتج من A&M Store:\n`;
 
-            if (navigator.share) {
-                navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(shareText + shareUrl).then(() => {
-                    window.showToast("تم نسخ رابط المنتج بنجاح! 🔗", "#0984e3"); 
-                });
-            }
-        }
+    if (navigator.share) {
+        navigator.share({ 
+            title: p.name, 
+            text: shareText, 
+            url: shareUrl 
+        }).catch(() => {});
+    } else {
+        // في حال النسخ اليدوي للرابط
+        navigator.clipboard.writeText(shareText + shareUrl).then(() => {
+            window.showToast("تم نسخ رابط المنتج بنجاح! 🔗", "#0984e3"); 
+        });
+    }
+}
 
         window.updateCartBadge = function() { document.getElementById('cart-count-badge').innerText = window.cart.length; }
 
