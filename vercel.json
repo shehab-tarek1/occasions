@@ -2,12 +2,6 @@
   "rewrites":[
     {
       "source": "/",
-      "has":[
-        {
-          "type": "query",
-          "key": "p"
-        }
-      ],
       "destination": "/api/share"
     }
   ]
