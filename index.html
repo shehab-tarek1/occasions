@@ -214,7 +214,6 @@
         </div>
     </footer>
 
-    <!-- Firebase SDK (V10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -232,15 +231,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.products =[];
-        window.cart = JSON.parse(localStorage.getItem('am_cart')) ||[];
+        window.products = [];
+        window.cart = JSON.parse(localStorage.getItem('am_cart')) || [];
         window.SELLER_PHONE = "201141226046";
         window.historyStack = ['home'];
 
         async function fetchProducts() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
-                window.products = querySnapshot.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
+                // 🔴 التعديل الأول: ضمان وجود حقل الـ ID لتفادي الأعطال
+                window.products = querySnapshot.docs.map(doc => ({ id: doc.id, firebaseId: doc.id, ...doc.data() }));
 
                 document.getElementById('global-loader').style.display = 'none';
 
@@ -249,9 +249,10 @@
                 window.history.replaceState({ page: 'home' }, "");
 
                 if (sharedCode) {
-                    const targetProduct = window.products.find(x => x.shortCode === sharedCode);
+                    // 🔴 التعديل الثاني: توحيد نوع البحث ليطابق النصوص مع الأرقام
+                    const targetProduct = window.products.find(x => String(x.shortCode) === String(sharedCode));
                     if (targetProduct) {
-                        window.historyStack =['home', 'details'];
+                        window.historyStack = ['home', 'details'];
                         window.history.pushState({ page: 'details' }, "");
                         window.openProduct(targetProduct.id, false);
                         return;
@@ -287,7 +288,7 @@
         }
 
         window.navigateUI = function(pageId) {
-            const pages =['home', 'category', 'details', 'cart'];
+            const pages = ['home', 'category', 'details', 'cart'];
             pages.forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -323,32 +324,26 @@
         }
 
         window.shareProduct = function(event, id) {
-    event.stopPropagation();
-    const p = window.products.find(x => x.id === id);
-    if(!p) return;
+            event.stopPropagation();
+            const p = window.products.find(x => String(x.id) === String(id));
+            if(!p) return;
 
-    // الحصول على رابط الموقع (الدومين) الحالي
-    const domain = window.location.origin;
-    
-    // الرابط بصيغة /p/ لضمان سحب بيانات المعاينة من السيرفر
-    const shareUrl = `${domain}/p/${p.shortCode}`;
-    
-    // نص مختصر جداً لأن المعاينة ستكفّل بإظهار (الاسم، السعر، الكود، والصورة)
-    const shareText = `شاهد هذا المنتج من A&M Store:\n`;
+            const domain = window.location.origin;
+            const shareUrl = `${domain}/p/${p.shortCode}`;
+            const shareText = `شاهد هذا المنتج من A&M Store:\n`;
 
-    if (navigator.share) {
-        navigator.share({ 
-            title: p.name, 
-            text: shareText, 
-            url: shareUrl 
-        }).catch(() => {});
-    } else {
-        // في حال النسخ اليدوي للرابط
-        navigator.clipboard.writeText(shareText + shareUrl).then(() => {
-            window.showToast("تم نسخ رابط المنتج بنجاح! 🔗", "#0984e3"); 
-        });
-    }
-}
+            if (navigator.share) {
+                navigator.share({ 
+                    title: p.name, 
+                    text: shareText, 
+                    url: shareUrl 
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareText + shareUrl).then(() => {
+                    window.showToast("تم نسخ رابط المنتج بنجاح! 🔗", "#0984e3"); 
+                });
+            }
+        }
 
         window.updateCartBadge = function() { document.getElementById('cart-count-badge').innerText = window.cart.length; }
 
@@ -358,10 +353,11 @@
             let outOfStockBadge = (p.qty <= 0) ? `<div class="badge-outofstock">انتهت الكمية</div>` : '';
             let imgClass = (p.qty <= 0) ? 'img-outofstock' : '';
 
+            // 🔴 التعديل الثالث: إضافة علامات تنصيص للـ id لتفادي أخطاء الـ Syntax
             return `
-                <div class="inner-product-card" onclick="openProduct(${p.id})">
+                <div class="inner-product-card" onclick="openProduct('${p.id}')">
                     ${discountBadge}
-                    <div class="share-icon" onclick="shareProduct(event, ${p.id})" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="share-icon" onclick="shareProduct(event, '${p.id}')" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
                     <div class="img-container"><img src="${displayImg}" class="${imgClass}">${outOfStockBadge}</div>
                     <div class="product-price-badge">${p.price} ج.م</div>
                     <h3>${p.name}</h3><p>${p.category}</p>
@@ -438,18 +434,27 @@
         });
 
         window.openProduct = function(id, pushToHistory = true) {
-            const p = window.products.find(x => x.id === id);
+            const p = window.products.find(x => String(x.id) === String(id));
+            
+            // 🔴 التعديل الرابع: الحماية من عرض شاشة بيضاء إذا لم يجد المنتج
+            if (!p) {
+                window.resetAndNavigate('home');
+                return;
+            }
 
-            let imgsArray = p.images && p.images.length > 0 ? p.images.slice(0, 7) :[p.img];
+            let imgsArray = p.images && p.images.length > 0 ? p.images.slice(0, 7) : [p.img];
             let sliderHtml = imgsArray.map(imgSrc => `<img src="${imgSrc}" onclick="openLightbox(this.src)">`).join('');
             let dotsHtml = imgsArray.map((_, i) => `<span class="dot ${i===0 ? 'active' : ''}"></span>`).join('');
 
-            // تجهيز عناصر القوائم المنسدلة
-            let sizeItems = p.sizes.map(s => `<div class="custom-select-item" onclick="selectCustomOption('size', '${s}')">${s}</div>`).join('');
-            let colorItems = p.colors.map(c => `<div class="custom-select-item" onclick="selectCustomOption('color', '${c}')">${c}</div>`).join('');
+            // 🔴 التعديل الخامس: الحماية من انكسار الصفحة إذا لم يوجد ألوان أو مقاسات
+            let safeSizes = p.sizes || [];
+            let safeColors = p.colors || [];
 
-            let defaultSize = p.sizes.length > 0 ? p.sizes[0] : '';
-            let defaultColor = p.colors.length > 0 ? p.colors[0] : '';
+            let sizeItems = safeSizes.map(s => `<div class="custom-select-item" onclick="selectCustomOption('size', '${s}')">${s}</div>`).join('');
+            let colorItems = safeColors.map(c => `<div class="custom-select-item" onclick="selectCustomOption('color', '${c}')">${c}</div>`).join('');
+
+            let defaultSize = safeSizes.length > 0 ? safeSizes[0] : '';
+            let defaultColor = safeColors.length > 0 ? safeColors[0] : '';
 
             // تجهيز قسم الطلب والأزرار
             let orderSectionHTML = '';
@@ -458,11 +463,9 @@
                 <div class="options-section" style="overflow: visible;">
                     <div style="font-weight:bold; font-size:0.95rem; color:var(--bg-dark-blue); margin-bottom: 12px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">تجهيز الطلب:</div>
                     
-                    <!-- حقول مخفية لحفظ القيم المختارة -->
                     <input type="hidden" id="order-size" value="${defaultSize}">
                     <input type="hidden" id="order-color" value="${defaultColor}">
 
-                    <!-- قائمة المقاس -->
                     <div class="custom-select-wrapper">
                         <label>اختر المقاس:</label>
                         <div class="custom-select-btn" onclick="toggleDropdown('size-dropdown')">
@@ -472,7 +475,6 @@
                         <div class="custom-select-list" id="size-dropdown">${sizeItems}</div>
                     </div>
 
-                    <!-- قائمة اللون -->
                     <div class="custom-select-wrapper">
                         <label>اختر اللون:</label>
                         <div class="custom-select-btn" onclick="toggleDropdown('color-dropdown')">
@@ -482,7 +484,6 @@
                         <div class="custom-select-list" id="color-dropdown">${colorItems}</div>
                     </div>
 
-                    <!-- حقل إدخال الكمية العادي كما طلبت -->
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label>الكمية المطلوبة:</label>
                         <input type="number" id="order-qty" class="form-control" value="1" min="1" max="${p.qty}" oninput="updateOrderTotal(${p.price}, this.value)">
@@ -493,10 +494,10 @@
                     </div>
 
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <button class="btn btn-whatsapp" style="flex: 1; margin-top: 0;" onclick="confirmDirectOrder(${p.id})">
+                        <button class="btn btn-whatsapp" style="flex: 1; margin-top: 0;" onclick="confirmDirectOrder('${p.id}')">
                             <i class="fa-brands fa-whatsapp"></i> اطلب الآن
                         </button>
-                        <button class="btn btn-cart" style="width: 60px; height: 48px; margin-top: 0; padding: 0; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;" onclick="addFromFormToCart(${p.id})" title="إضافة للسلة">
+                        <button class="btn btn-cart" style="width: 60px; height: 48px; margin-top: 0; padding: 0; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;" onclick="addFromFormToCart('${p.id}')" title="إضافة للسلة">
                             <i class="fa-solid fa-cart-plus"></i>
                         </button>
                     </div>
@@ -524,7 +525,7 @@
 
                 <div class="options-section" style="font-size:0.85rem; color:var(--text-dark)">
                     <div style="margin-bottom: 10px;"><i class="fa-solid fa-hashtag" style="color:var(--accent); width: 15px;"></i> <strong>كود المنتج:</strong> <span style="color:var(--bg-dark-blue); font-weight:bold;">${p.shortCode}</span></div>
-                    <div><i class="fa-solid fa-location-dot" style="color:var(--accent); width: 15px;"></i> <strong>التوصيل:</strong> ${p.delivery}</div>
+                    <div><i class="fa-solid fa-location-dot" style="color:var(--accent); width: 15px;"></i> <strong>التوصيل:</strong> ${p.delivery || 'غير محدد'}</div>
                 </div>
 
                 ${orderSectionHTML}
@@ -538,7 +539,7 @@
         }
 
         window.addFromFormToCart = function(id) {
-            const p = window.products.find(x => x.id === id);
+            const p = window.products.find(x => String(x.id) === String(id));
             let size = document.getElementById('order-size').value, color = document.getElementById('order-color').value, qty = parseInt(document.getElementById('order-qty').value);
             if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
             window.cart.push({ ...p, selSize: size, selColor: color, selQty: qty });
@@ -548,13 +549,13 @@
         }
 
         window.confirmDirectOrder = function(id) {
-            const p = window.products.find(x => x.id === id);
+            const p = window.products.find(x => String(x.id) === String(id));
             let size = document.getElementById('order-size').value, color = document.getElementById('order-color').value, qty = parseInt(document.getElementById('order-qty').value);
             if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
 
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-const productUrl = `${cleanBaseUrl}/p/${p.shortCode}`;
+            const productUrl = `${cleanBaseUrl}/p/${p.shortCode}`;
             const totalPrice = p.price * qty;
 
             let msg = `مرحباً A&M Store، أود طلب:\n\n🔖 كود المنتج: ${p.shortCode}\n المنتج: ${p.name}\n القسم: ${p.category}\n اللون: ${color}\n المقاس: ${size}\n العدد: ${qty}\n إجمالي الحساب: ${totalPrice} ج.م\n\n🔗 الرابط: ${productUrl}`;
@@ -605,10 +606,10 @@ const productUrl = `${cleanBaseUrl}/p/${p.shortCode}`;
 
             let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n` + window.cart.map((item, i) => {
                 const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-const productUrl = `${cleanBaseUrl}/p/${item.shortCode}`;
+                const productUrl = `${cleanBaseUrl}/p/${item.shortCode}`;
                 let itemTotal = item.price * item.selQty;
                 totalCartPrice += itemTotal;
-                return `${i+1}- ${item.name} (قسم: ${item.category})\n🔖 كود: ${item.shortCode}\n لون: ${item.selColor} /  مقاس: ${item.selSize} / عدد: ${item.selQty}\n السعر: ${itemTotal} ج.م\n🔗 الرابط: ${productUrl}`;
+                return `${i+1}- ${item.name} (قسم: ${item.category})\n🔖 كود: ${item.shortCode}\n لون: ${item.selColor} / مقاس: ${item.selSize} / عدد: ${item.selQty}\n السعر: ${itemTotal} ج.م\n🔗 الرابط: ${productUrl}`;
             }).join('\n\n-----------------\n\n');
 
             msg += `\n\n🛒 إجمالي الحساب الكلي: ${totalCartPrice} ج.م`;
