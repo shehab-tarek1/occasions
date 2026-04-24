@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- إعدادات ظهور الموقع وصورته عند المشاركة في واتساب وفيسبوك (Meta Tags) -->
     <title>A&M Store</title>
+    <meta name="description" content="تسوق أحدث الملابس الرجالي، الحريمي، والأطفال بأفضل الأسعار.">
+    <meta property="og:title" content="A&M Store | متجر الأزياء الأول">
+    <meta property="og:description" content="تشكيلة رائعة من أحدث الموديلات، اطلب الآن بأفضل الأسعار.">
+    <meta property="og:image" content="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg">
+    <meta property="og:type" content="website">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -55,37 +63,34 @@
         .back-arrow:hover { transform: translateX(5px); background: var(--border-light); }
         .top-title-text { font-size: 0.85rem; font-weight: bold; color: var(--text-muted); background: var(--bg-surface); padding: 8px 15px; border-radius: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-light);}
 
-        /* الأقسام الخارجية (بالشريط الأزرق) */
+        /* الأقسام الخارجية */
         .categories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
         .category-card { background-color: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.3s; border: 1px solid var(--border-light); }
         .category-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        /* استخدام contain وعمل بادينج لتظهر الصورة كاملة */
-        .category-card img { width: 100%; height: 130px; object-fit: contain; background: var(--bg-surface); padding: 5px; display: block;}
+        .category-card img { width: 100%; height: 130px; object-fit: cover; object-position: top center; display: block;}
         .category-card h3 { background-color: var(--bg-dark-blue); color: var(--text-light); padding: 10px; font-size: 0.95rem; margin: 0; border-top: 1px solid rgba(255,255,255,0.1);}
 
-        /* المنتجات الداخلية (وتستخدم أيضاً في السلايدر) */
+        /* المنتجات الداخلية والسلايدر */
         .inner-product-card { position: relative; background: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); transition: 0.3s; flex-shrink: 0; scroll-snap-align: start; }
         .inner-product-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        /* استخدام contain وعمل بادينج لتظهر الصورة كاملة */
-        .inner-product-card img { width: 100%; height: 130px; object-fit: contain; background: var(--bg-surface); padding: 5px; display: block; }
+        /* استخدام cover وعمل زوم خفيف للملء وعدم وجود فراغات */
+        .inner-product-card img { width: 100%; height: 130px; object-fit: cover; object-position: top center; display: block; border-bottom: 1px solid var(--border-light);}
         .inner-product-card h3 { padding: 10px 8px 4px; font-size: 0.85rem; color: var(--text-dark); margin: 0; }
         .inner-product-card p { padding: 0 8px 10px; font-size: 0.7rem; color: var(--text-muted); margin: 0; }
 
-        /* السلايدر الخارجي المحدث */
+        /* السلايدر الخارجي */
         .slider-section { background-color: var(--bg-surface); padding: 18px 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px;}
         .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--border-light); padding-bottom: 8px;}
         .slider-header h2 { font-size: 1.05rem; color: var(--bg-dark-blue); margin: 0; }
-        
         .slider-nav { display: flex; gap: 8px; }
         .slider-arrow { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-main); color: var(--bg-dark-blue); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 0.7rem; transition: 0.3s; border: 1px solid var(--border-light);}
         .slider-arrow:hover { background: var(--bg-dark-blue); color: white; }
-
         .slider-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 12px; padding-bottom: 5px; scroll-snap-type: x mandatory;}
-        .slider-container::-webkit-scrollbar { display: none; }
+        .slider-container::-webkit-scrollbar { display: none; } 
         .slider-container .inner-product-card { width: calc(50% - 6px); }
 
         /* أيقونة المشاركة */
-        .share-icon { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: var(--bg-dark-blue); width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; z-index: 10; font-size: 0.8rem;}
+        .share-icon { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); color: var(--bg-dark-blue); width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; z-index: 10; font-size: 0.8rem;}
         .share-icon:hover { background: var(--bg-dark-blue); color: white; transform: scale(1.1); }
 
         /* الفوتر العائم */
@@ -94,19 +99,18 @@
         .social-links { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         .social-links a { color: var(--text-light); font-size: 1.4rem; text-decoration: none; transition: 0.3s; }
 
-        /* سلايدر الصور المتعددة للتفاصيل */
+        /* سلايدر الصور المتعددة في التفاصيل */
         .details-image-wrapper { width: 100%; max-width: 300px; margin: 0 auto 10px auto; overflow: hidden; position: relative;}
-        .details-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border-light); background: var(--bg-surface); }
+        .details-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border-light); }
         .details-slider::-webkit-scrollbar { display: none; }
-        /* عرض الصور في التفاصيل كاملة بدون قص */
-        .details-slider img { flex: 0 0 100%; width: 300px; height: 300px; object-fit: contain; padding: 10px; background: var(--bg-surface); scroll-snap-align: center; cursor: zoom-in; }
+        .details-slider img { flex: 0 0 100%; width: 300px; height: 300px; object-fit: cover; object-position: top center; scroll-snap-align: center; cursor: zoom-in; }
         
         .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; margin-bottom: 15px;}
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--silver); transition: 0.3s; }
         .dot.active { background: var(--bg-dark-blue); transform: scale(1.2); }
 
         /* نافذة التكبير */
-        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px;}
+        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px;}
         .lightbox img { width: 100%; max-width: 400px; max-height: 80vh; border-radius: 15px; object-fit: contain; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
         .close-lightbox { color: white; font-size: 2rem; margin-bottom: 20px; cursor: pointer; }
 
@@ -129,7 +133,7 @@
 
     <header>
         <div class="header-right" onclick="resetAndNavigate('home')">
-            <img src="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg" class="logo-img">
+            <img src="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg" class="logo-img" alt="Logo">
             <div class="site-name">A&M Store</div>
         </div>
         <div class="header-left">
@@ -145,7 +149,7 @@
         <img id="lightbox-img" src="">
     </div>
 
-    <main id="home">
+    <main id="home" class="hidden">
         <div class="categories-grid">
             <div class="category-card" onclick="openCategory('رجالي')">
                 <img src="https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=400">
@@ -215,7 +219,7 @@
     </main>
 
     <footer id="main-footer">
-        <img src="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg" class="footer-logo">
+        <img src="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg" class="footer-logo" alt="Logo">
         <h2 style="color: var(--text-light); font-size:1.1rem;">A&M Store</h2>
         <div style="margin-top: 5px; color: #cbd5e1; font-size: 0.85rem;">
             <p>📍 العنوان: مصر</p>
@@ -293,28 +297,30 @@
             }
         }
 
-        // دالة المشاركة المحدثة باستخدام Web Share API
+        // دالة المشاركة وإنشاء الرابط الذكي
         function shareProduct(event, id) {
-            event.stopPropagation(); // منع فتح المنتج
+            event.stopPropagation();
             const p = products.find(x => x.id === id);
             if(!p) return;
 
-            const shareTitle = `A&M Store - ${p.name}`;
-            const shareText = `✨ شاهد هذا المنتج الرائع من A&M Store!\n🛍️ المنتج: ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، تواصل معنا وأرسل كود المنتج!`;
-            // نرسل رابط المتجر الأساسي
-            const shareUrl = window.location.href.split('#')[0]; 
+            // توليد الرابط مع الكود المختصر
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            const shareUrl = `${baseUrl}?p=${p.shortCode}`;
+
+            const shareTitle = `A&M Store | ${p.name}`;
+            const shareText = `✨ شاهد هذا المنتج الرائع من A&M Store!\n🛍️ ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n🛒 اضغط على الرابط التالي لمشاهدة التفاصيل:\n`;
 
             if (navigator.share) {
-                // إذا كان متصفح الموبايل يدعم المشاركة (سيفتح قائمة واتساب/فيسبوك الأصلية)
+                // فتح قائمة الموبايل الأصلية
                 navigator.share({
                     title: shareTitle,
                     text: shareText,
                     url: shareUrl
-                }).catch((error) => console.log('خطأ أو إلغاء المشاركة:', error));
+                }).catch((error) => console.log('إلغاء المشاركة'));
             } else {
-                // إذا كان من الكمبيوتر ولا يدعم المشاركة، نقوم بالنسخ للحافظة
-                navigator.clipboard.writeText(shareText + '\nرابط المتجر: ' + shareUrl).then(() => {
-                    alert("تم نسخ تفاصيل المنتج وكود الطلب بنجاح!\nيمكنك لصقها وإرسالها لأصدقائك.");
+                // بديل للكمبيوتر
+                navigator.clipboard.writeText(shareText + shareUrl).then(() => {
+                    alert(`تم نسخ رابط وتفاصيل المنتج بنجاح!\nالرابط: ${shareUrl}`);
                 });
             }
         }
@@ -437,7 +443,7 @@
 
             document.getElementById('order-form-content').innerHTML = `
                 <div style="display:flex; gap:12px; margin-bottom:15px; align-items:center; background:var(--bg-main); padding:10px; border-radius:12px;">
-                    <img src="${displayImg}" style="width:60px; height:60px; border-radius:10px; object-fit:contain; background: white;">
+                    <img src="${displayImg}" style="width:60px; height:60px; border-radius:10px; object-fit:cover; object-position: top center;">
                     <div>
                         <strong style="font-size:0.95rem;">${p.name}</strong><br>
                         <small style="color:var(--text-muted); font-size:0.8rem;">المتاح في المخزن: ${p.qty}</small>
@@ -475,7 +481,7 @@
             const c = document.getElementById('cart-items');
             c.innerHTML = cart.length ? cart.map((item, i) => `
                 <div class="info-bar" style="margin-bottom:12px; padding: 10px;">
-                    <img src="${item.images ? item.images[0] : item.img}" style="width:60px; height:60px; border-radius:10px; object-fit:contain; background: white;">
+                    <img src="${item.images ? item.images[0] : item.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover; object-position: top center;">
                     <div style="flex:1; margin: 0 12px;">
                         <strong style="font-size:0.9rem;">${item.name}</strong><br>
                         <small style="color:var(--text-muted); font-size:0.75rem;">لون: ${item.selColor} | مقاس: ${item.selSize} | <strong style="color:var(--bg-dark-blue)">العدد: ${item.selQty}</strong></small>
@@ -492,7 +498,25 @@
             window.open(`https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        updateCartBadge(); renderHomeSlider();
+        // قراءة الرابط واستخراج المنتج المشترك منه عند فتح الموقع
+        window.addEventListener('DOMContentLoaded', () => {
+            updateCartBadge();
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedCode = urlParams.get('p');
+            
+            if (sharedCode) {
+                const targetProduct = products.find(x => x.shortCode === sharedCode);
+                if (targetProduct) {
+                    historyStack = ['home'];
+                    openProduct(targetProduct.id);
+                    return;
+                }
+            }
+            
+            // في حالة عدم وجود رابط خاص يتم فتح الرئيسية كالمعتاد
+            resetAndNavigate('home');
+        });
+
     </script>
 </body>
 </html>
