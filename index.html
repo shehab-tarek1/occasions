@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #f4f6f9; /* تم إرجاع لون الخلفية السابق */
+            --bg-main: #f4f6f9; 
             --bg-surface: #ffffff;
-            --bg-dark-blue: #0f1c2e; /* تم إرجاع اللون الأزرق الغامق الأصلي */
+            --bg-dark-blue: #0f1c2e; 
             --text-light: #f8f9fa; 
             --text-dark: #2d3436;
             --text-muted: #636e72;
@@ -23,7 +23,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center;}
 
-        /* الهيدر بحواف دائرية من الأسفل فقط */
+        /* الهيدر */
         header { 
             width: 100%; 
             display: flex; 
@@ -62,25 +62,29 @@
         .category-card img { width: 100%; height: 130px; object-fit: cover; display: block;}
         .category-card h3 { background-color: var(--bg-dark-blue); color: var(--text-light); padding: 10px; font-size: 0.95rem; margin: 0; border-top: 1px solid rgba(255,255,255,0.1);}
 
-        /* المنتجات الداخلية داخل القسم (لون أبيض) */
-        .inner-product-card { position: relative; background: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); transition: 0.3s; }
+        /* المنتجات الداخلية (وتستخدم أيضاً في السلايدر) */
+        .inner-product-card { position: relative; background: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); transition: 0.3s; flex-shrink: 0; scroll-snap-align: start; }
         .inner-product-card:hover { transform: translateY(-5px); border-color: var(--accent); }
         .inner-product-card img { width: 100%; height: 130px; object-fit: cover; display: block; }
         .inner-product-card h3 { padding: 10px 8px 4px; font-size: 0.85rem; color: var(--text-dark); margin: 0; }
         .inner-product-card p { padding: 0 8px 10px; font-size: 0.7rem; color: var(--text-muted); margin: 0; }
 
-        /* السلايدر الخارجي */
+        /* السلايدر الخارجي المحدث */
         .slider-section { background-color: var(--bg-surface); padding: 18px 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px;}
-        .slider-section h2 { margin-bottom: 12px; font-size: 1.05rem; border-bottom: 2px solid var(--border-light); padding-bottom: 8px; color: var(--bg-dark-blue);}
-        .slider-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 12px; padding-bottom: 10px; }
-        .slider-container::-webkit-scrollbar { height: 6px; }
-        .slider-container::-webkit-scrollbar-thumb { background: var(--silver); border-radius: 10px; }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--border-light); padding-bottom: 8px;}
+        .slider-header h2 { font-size: 1.05rem; color: var(--bg-dark-blue); margin: 0; }
         
-        .product-card { position: relative; min-width: 130px; background: var(--bg-main); border-radius: var(--radius); padding: 10px; text-align: center; cursor: pointer; border: 1px solid var(--border-light); transition: 0.3s; }
-        .product-card:hover { border-color: var(--accent); }
-        .product-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 12px; }
-        .product-card h4 { font-size: 0.85rem; margin-top: 8px; color: var(--text-dark); }
+        /* أسهم السلايدر */
+        .slider-nav { display: flex; gap: 8px; }
+        .slider-arrow { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-main); color: var(--bg-dark-blue); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 0.7rem; transition: 0.3s; border: 1px solid var(--border-light);}
+        .slider-arrow:hover { background: var(--bg-dark-blue); color: white; }
+
+        .slider-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 12px; padding-bottom: 5px; scroll-snap-type: x mandatory;}
+        .slider-container::-webkit-scrollbar { display: none; } /* إخفاء شريط التمرير السفلي */
         
+        /* ضبط حجم بطاقة السلايدر لتعرض 2 فقط بالضبط */
+        .slider-container .inner-product-card { width: calc(50% - 6px); }
+
         /* أيقونة المشاركة */
         .share-icon { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: var(--bg-dark-blue); width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; z-index: 10; font-size: 0.8rem;}
         .share-icon:hover { background: var(--bg-dark-blue); color: white; transform: scale(1.1); }
@@ -91,13 +95,12 @@
         .social-links { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         .social-links a { color: var(--text-light); font-size: 1.4rem; text-decoration: none; transition: 0.3s; }
 
-        /* سلايدر الصور المتعددة */
+        /* سلايدر الصور المتعددة للتفاصيل */
         .details-image-wrapper { width: 100%; max-width: 300px; margin: 0 auto 10px auto; overflow: hidden; position: relative;}
         .details-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border-light); }
         .details-slider::-webkit-scrollbar { display: none; }
         .details-slider img { flex: 0 0 100%; width: 300px; height: 300px; object-fit: cover; scroll-snap-align: center; cursor: zoom-in; }
         
-        /* نقاط السلايدر */
         .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; margin-bottom: 15px;}
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--silver); transition: 0.3s; }
         .dot.active { background: var(--bg-dark-blue); transform: scale(1.2); }
@@ -163,7 +166,13 @@
         </div>
 
         <div class="slider-section">
-            <h2>أحدث الإضافات</h2>
+            <div class="slider-header">
+                <h2>أحدث الإضافات</h2>
+                <div class="slider-nav">
+                    <div class="slider-arrow" onclick="scrollSlider('right')"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="slider-arrow" onclick="scrollSlider('left')"><i class="fa-solid fa-chevron-left"></i></div>
+                </div>
+            </div>
             <div class="slider-container" id="latest-products-slider"></div>
         </div>
     </main>
@@ -229,7 +238,8 @@
             { id: 1, shortCode: generateShortCode(), name: "بدلة كلاسيك إيطالي", category: "رجالي", qty: 10, sizes:["M","L","XL","XXL"], colors:["أسود","كحلي داكن","رصاصي"], delivery: "القاهرة والإسكندرية", images:["https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=400", "https://images.pexels.com/photos/1328885/pexels-photo-1328885.jpeg?auto=compress&cs=tinysrgb&w=400", "https://images.pexels.com/photos/3778233/pexels-photo-3778233.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
             { id: 2, shortCode: generateShortCode(), name: "فستان سهرة لامع", category: "حريمي", qty: 5, sizes:["S","M","L"], colors:["فضي لامع","أسود ملكي"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400", "https://images.pexels.com/photos/2065195/pexels-photo-2065195.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
             { id: 3, shortCode: generateShortCode(), name: "طقم أطفال صيفي", category: "أطفال", qty: 15, sizes:["سنتين","4 سنوات","6 سنوات"], colors:["أبيض","أزرق سماوي"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
-            { id: 4, shortCode: generateShortCode(), name: "تيشيرت شبابي تريندي", category: "عروض", qty: 30, sizes:["M","L","XL"], colors:["أسود","أبيض"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/5625009/pexels-photo-5625009.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false }
+            { id: 4, shortCode: generateShortCode(), name: "تيشيرت شبابي تريندي", category: "عروض", qty: 30, sizes:["M","L","XL"], colors:["أسود","أبيض"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/5625009/pexels-photo-5625009.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
+            { id: 5, shortCode: generateShortCode(), name: "قميص كاجوال", category: "رجالي", qty: 20, sizes:["M","L"], colors:["أزرق"], delivery: "القاهرة", images:["https://images.pexels.com/photos/297933/pexels-photo-297933.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false }
         ];
 
         if(!localStorage.getItem('am_products') || JSON.parse(localStorage.getItem('am_products')).length === 0) {
@@ -238,7 +248,7 @@
 
         let products = JSON.parse(localStorage.getItem('am_products')) ||[];
         products = products.map(p => {
-            if(!p.images) p.images = [p.img]; 
+            if(!p.images) p.images =[p.img]; 
             if(!p.shortCode) p.shortCode = generateShortCode();
             return p;
         });
@@ -301,16 +311,30 @@
             let visibleProducts = products.filter(p => !p.hidden);
             if(visibleProducts.length === 0) return slider.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">لا توجد منتجات حالياً.</p>';
             
-            visibleProducts.slice().reverse().slice(0, 5).forEach(p => {
+            // قمنا بعرض آخر 10 منتجات لتشغيل حركة السلايدر بكفاءة
+            visibleProducts.slice().reverse().slice(0, 10).forEach(p => {
                 let displayImg = p.images ? p.images[0] : p.img;
                 slider.innerHTML += `
-                    <div class="product-card" onclick="openProduct(${p.id})">
+                    <div class="inner-product-card" onclick="openProduct(${p.id})">
                         <div class="share-icon" onclick="shareProduct(event, '${p.shortCode}')" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
                         <img src="${displayImg}">
-                        <h4>${p.name}</h4>
+                        <h3>${p.name}</h3>
+                        <p>${p.category}</p>
                     </div>
                 `;
             });
+        }
+
+        // تحريك السلايدر عبر الأسهم الدائرية
+        function scrollSlider(direction) {
+            const slider = document.getElementById('latest-products-slider');
+            // التمرير بمقدار عرض بطاقة واحدة تقريباً
+            const scrollAmount = slider.clientWidth / 2;
+            if(direction === 'right') {
+                slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            } else {
+                slider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            }
         }
 
         function openCategory(catName) {
@@ -323,7 +347,6 @@
             filtered.forEach(p => {
                 let displayImg = p.images ? p.images[0] : p.img;
                 
-                // هنا استخدام كود البطاقات الداخلية ذات اللون الأبيض والنصوص الصغيرة
                 container.innerHTML += `
                     <div class="inner-product-card" onclick="openProduct(${p.id})">
                         <div class="share-icon" onclick="shareProduct(event, '${p.shortCode}')" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
@@ -358,7 +381,7 @@
             let sizesHtml = p.sizes.map(s => `<span class="badge">${s}</span>`).join('');
             let colorsHtml = p.colors.map(c => `<span class="badge">${c}</span>`).join('');
             
-            let imgsArray = p.images && p.images.length > 0 ? p.images.slice(0, 7) : [p.img];
+            let imgsArray = p.images && p.images.length > 0 ? p.images.slice(0, 7) :[p.img];
             let sliderHtml = imgsArray.map(imgSrc => `<img src="${imgSrc}" onclick="openLightbox(this.src)">`).join('');
             let dotsHtml = imgsArray.map((_, i) => `<span class="dot ${i===0 ? 'active' : ''}"></span>`).join('');
 
