@@ -4,35 +4,23 @@ const path = require('path');
 module.exports = async (req, res) => {
     const p = req.query.p;
 
-    // 1. قراءة ملف المتجر (سواء كان اسمه index.html أو store.html)
-    let htmlPath = path.join(process.cwd(), 'index.html');
-    if (!fs.existsSync(htmlPath)) {
-        htmlPath = path.join(process.cwd(), 'store.html');
-    }
-    
-    let html = '';
-    try {
-        html = fs.readFileSync(htmlPath, 'utf8');
-    } catch (e) {
-        return res.status(500).send('HTML file not found');
-    }
-
-    // إذا لم يكن هناك كود منتج، اعرض الموقع العادي
+    // إذا لم يكن هناك كود، وجهه للرئيسية
     if (!p) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(html);
+        res.writeHead(302, { Location: '/' });
+        return res.end();
     }
 
-    // 2. فحص هل الزائر روبوت (واتساب/فيسبوك)
+    // فحص هل الزائر روبوت (واتساب/فيسبوك) أم مستخدم عادي
     const userAgent = (req.headers['user-agent'] || '').toLowerCase();
     const isBot = /whatsapp|facebook|twitter|telegram|linkedin|bot|crawler|spider|discord/i.test(userAgent);
 
+    // 🔴 إذا كان مستخدم حقيقي، نقوم بتوجيهه للمتجر فوراً ليفتح المنتج
     if (!isBot) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(html);
+        res.writeHead(302, { Location: `/?p=${p}` });
+        return res.end();
     }
 
-    // 3. جلب بيانات المنتج من Firebase
+    // 🟢 إذا كان روبوت واتساب، نجلب بيانات المنتج من Firebase
     const projectId = 'marketing-e9fdf';
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
 
@@ -42,7 +30,7 @@ module.exports = async (req, res) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 structuredQuery: {
-                    from: [{ collectionId: 'products' }],
+                    from:[{ collectionId: 'products' }],
                     where: {
                         fieldFilter: {
                             field: { fieldPath: 'shortCode' },
@@ -71,14 +59,14 @@ module.exports = async (req, res) => {
         const titleWithPrice = `${title}${formattedPrice ? ' | ' + formattedPrice : ''}`;
         const finalDesc = `🔖 كود المنتج: ${p}\n${desc}`;
 
-        let imageUrl = ''; 
+        let imageUrl = 'https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg'; 
         if (fields.images?.arrayValue?.values?.length > 0) {
             imageUrl = fields.images.arrayValue.values[0].stringValue;
         } else if (fields.img?.stringValue) {
             imageUrl = fields.img.stringValue;
         }
 
-        // إجبار الصورة لتكون JPG ومربعة 600x600 ليقبلها الواتساب
+        // إجبار الصورة لتكون JPG ومربعة 600x600 للواتساب
         if (imageUrl.includes('cloudinary.com')) {
             const urlParts = imageUrl.split('/');
             const fileId = urlParts.pop(); 
@@ -86,28 +74,38 @@ module.exports = async (req, res) => {
             imageUrl = `https://res.cloudinary.com/dsxrjmcxs/image/upload/w_600,h_600,c_fill,q_80,f_jpg/${version}/${fileId}`;
         }
 
-        // 🔴 الحل السحري (Regex): استبدال الميتا تاج مهما كان الرابط القديم الموجود فيها
-        html = html.replace(/<title>.*?<\/title>/i, `<title>${titleWithPrice}</title>`);
-        html = html.replace(/<meta property="og:title" content=".*?">/i, `<meta property="og:title" content="${titleWithPrice}">`);
-        html = html.replace(/<meta property="og:description" content=".*?">/i, `<meta property="og:description" content="${finalDesc}">`);
-        html = html.replace(/<meta property="og:image" content=".*?">/i, `<meta property="og:image" content="${imageUrl}">`);
-
-        // إضافة أكواد الواتساب الإجبارية
-        const whatsappMetaTags = `
-            <meta property="og:image:secure_url" content="${imageUrl}">
-            <meta property="og:image:type" content="image/jpeg">
-            <meta property="og:image:width" content="600">
-            <meta property="og:image:height" content="600">
+        // إرسال صفحة مخصصة للواتساب فقط
+        const botHtml = `
+            <!DOCTYPE html>
+            <html lang="ar" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>${titleWithPrice}</title>
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content="${titleWithPrice}" />
+                <meta property="og:description" content="${finalDesc}" />
+                <meta property="og:image" content="${imageUrl}" />
+                <meta property="og:image:secure_url" content="${imageUrl}" />
+                <meta property="og:image:type" content="image/jpeg" />
+                <meta property="og:image:width" content="600" />
+                <meta property="og:image:height" content="600" />
+                <meta property="og:site_name" content="A&M Store" />
+                <meta property="og:url" content="https://${req.headers.host}/p/${p}" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="${titleWithPrice}" />
+                <meta name="twitter:description" content="${finalDesc}" />
+                <meta name="twitter:image" content="${imageUrl}" />
+            </head>
+            <body></body>
+            </html>
         `;
-        html = html.replace('</head>', `${whatsappMetaTags}</head>`);
 
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800');
-        return res.status(200).send(html);
+        return res.status(200).send(botHtml);
 
     } catch (error) {
-        console.error("Error:", error);
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(html);
+        res.writeHead(302, { Location: '/' });
+        return res.end();
     }
 };
