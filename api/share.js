@@ -7,9 +7,16 @@ module.exports = async (req, res) => {
         return res.end();
     }
 
-    // فحص هل الزائر روبوت (واتساب/فيسبوك/إلخ) أم مستخدم عادي
+    // 🔴 التعديل السحري هنا: التفريق بين روبوت واتساب والمستخدم البشري داخل واتساب
     const userAgent = (req.headers['user-agent'] || '').toLowerCase();
-    const isBot = /whatsapp|facebook|twitter|telegram|linkedin|bot|crawler|spider|discord|viber|skype/i.test(userAgent);
+    
+    // روبوت واتساب الحقيقي لجلب الصورة لا يحتوي على mozilla، بينما المتصفح الداخلي للمستخدم البشري يحتوي عليها
+    const isWhatsAppBot = userAgent.includes('whatsapp') && !userAgent.includes('mozilla');
+    
+    // باقي روبوتات المنصات الأخرى
+    const isOtherBot = /bot|crawler|spider|facebookexternalhit|twitter|telegram|linkedin|discord|viber|skype/i.test(userAgent);
+
+    const isBot = isWhatsAppBot || isOtherBot;
 
     // 🔴 إذا كان مستخدم حقيقي، نقوم بتوجيهه للمتجر فوراً ليفتح المنتج
     if (!isBot) {
@@ -58,7 +65,7 @@ module.exports = async (req, res) => {
 
         // صورة افتراضية في حال عدم وجود صورة للمنتج
         let imageUrl = 'https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg'; 
-        
+
         if (fields.images?.arrayValue?.values?.length > 0) {
             imageUrl = fields.images.arrayValue.values[0].stringValue;
         } else if (fields.img?.stringValue) {
@@ -102,7 +109,7 @@ module.exports = async (req, res) => {
         // إعداد الهيدر مع الكاش لتحسين الأداء (SEO & Performance)
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800');
-        
+
         return res.status(200).send(botHtml);
 
     } catch (error) {
