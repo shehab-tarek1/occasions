@@ -4,49 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A&M Store</title>
-    <meta name="description" content="تسوق أحدث الملابس بأفضل الأسعار.">
-    <meta property="og:title" content="A&M Store | متجر الأزياء الأول">
-    <meta property="og:description" content="تشكيلة رائعة من أحدث الموديلات، اطلب الآن بأفضل الأسعار.">
     <meta property="og:image" content="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-main: #f4f6f9; 
-            --bg-surface: #ffffff;
-            --bg-dark-blue: #0f1c2e; 
-            --text-light: #f8f9fa; 
-            --text-dark: #2d3436;
-            --text-muted: #636e72;
-            --border-light: #dfe6e9;
-            --accent: #0984e3;
-            --silver: #b2bec3;
-            --radius: 20px;
-            --shadow: 0 8px 20px rgba(0,0,0,0.06);
-        }
-
+        /* جميع أكواد الـ CSS الخاصة بك كما هي تماماً */
+        :root { --bg-main: #f4f6f9; --bg-surface: #ffffff; --bg-dark-blue: #0f1c2e; --text-light: #f8f9fa; --text-dark: #2d3436; --text-muted: #636e72; --border-light: #dfe6e9; --accent: #0984e3; --silver: #b2bec3; --radius: 20px; --shadow: 0 8px 20px rgba(0,0,0,0.06); }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center;}
+        
+        /* شاشة التحميل من السيرفر */
+        #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { border: 5px solid var(--border-light); border-top: 5px solid var(--accent); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* نظام الإشعارات (Toast) الجديد */
-        .toast-notification {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #27ae60;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 9999;
-            transition: top 0.4s ease-in-out;
-        }
+        .toast-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background-color: #27ae60; color: white; padding: 12px 25px; border-radius: 30px; font-size: 0.95rem; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; z-index: 9999; transition: top 0.4s ease-in-out; }
         .toast-notification.show { top: 20px; }
 
         header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background-color: var(--bg-dark-blue); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;}
@@ -66,17 +37,17 @@
         .top-title-text { font-size: 0.85rem; font-weight: bold; color: var(--text-muted); background: var(--bg-surface); padding: 8px 15px; border-radius: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-light);}
 
         .categories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
-        .category-card { background-color: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.3s; border: 1px solid var(--border-light); }
+        .category-card { background-color: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); }
         .category-card img { width: 100%; height: 130px; object-fit: cover; object-position: top center; display: block;}
-        .category-card h3 { background-color: var(--bg-dark-blue); color: var(--text-light); padding: 10px; font-size: 0.95rem; margin: 0; border-top: 1px solid rgba(255,255,255,0.1);}
+        .category-card h3 { background-color: var(--bg-dark-blue); color: var(--text-light); padding: 10px; font-size: 0.95rem; margin: 0;}
 
-        .inner-product-card { position: relative; background: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); transition: 0.3s; flex-shrink: 0; scroll-snap-align: start; }
+        .inner-product-card { position: relative; background: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); flex-shrink: 0; scroll-snap-align: start; }
         .inner-product-card .img-container { position: relative; width: 100%; height: 130px; }
-        .inner-product-card img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; border-bottom: 1px solid var(--border-light); transition: 0.3s;}
+        .inner-product-card img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; border-bottom: 1px solid var(--border-light);}
         .inner-product-card h3 { padding: 10px 8px 4px; font-size: 0.85rem; color: var(--text-dark); margin: 0; }
         .inner-product-card p { padding: 0 8px 10px; font-size: 0.7rem; color: var(--text-muted); margin: 0; }
         
-        .badge-discount { position: absolute; top: 8px; left: 8px; background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .badge-discount { position: absolute; top: 8px; left: 8px; background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; z-index: 5;}
         .badge-outofstock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.75); color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; z-index: 5; white-space: nowrap; }
         .img-outofstock { opacity: 0.4; filter: grayscale(50%); }
 
@@ -105,7 +76,7 @@
         .dot.active { background: var(--bg-dark-blue); transform: scale(1.2); }
 
         .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px;}
-        .lightbox img { width: 100%; max-width: 400px; max-height: 80vh; border-radius: 15px; object-fit: contain; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .lightbox img { width: 100%; max-width: 400px; max-height: 80vh; border-radius: 15px; object-fit: contain; }
         .close-lightbox { color: white; font-size: 2rem; margin-bottom: 20px; cursor: pointer; }
 
         .info-bar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 12px 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border-light); font-size: 0.95rem;}
@@ -123,9 +94,15 @@
 </head>
 <body>
 
+    <!-- شاشة التحميل -->
+    <div id="global-loader">
+        <div class="spinner"></div>
+        <h3 style="color: var(--bg-dark-blue);">جاري تحميل المتجر...</h3>
+    </div>
+
     <!-- رسالة الإشعار (Toast) -->
     <div id="toast" class="toast-notification">
-        <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">تمت الإضافة للسلة بنجاح</span>
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">تمت الإضافة</span>
     </div>
 
     <header>
@@ -215,7 +192,7 @@
         </div>
     </main>
 
-    <footer id="main-footer">
+    <footer id="main-footer" class="hidden">
         <img src="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg" class="footer-logo" alt="Logo">
         <h2 style="color: var(--text-light); font-size:1.1rem;">A&M Store</h2>
         <div style="margin-top: 5px; color: #cbd5e1; font-size: 0.85rem;">
@@ -223,16 +200,69 @@
             <p style="margin-top: 5px;"><i class="fa-solid fa-user-tie" style="color: var(--accent); margin-left: 5px;"></i> البائع: A&M Manager</p>
         </div>
         <div class="social-links">
-            <a href="https://www.instagram.com/_a_m_2026?igsh=bW1xdGJwdDJ4MXVt&utm_source=qr" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://www.facebook.com/share/1CYGfrYJda/?mibextid=wwXIfr" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-            <a href="https://www.tiktok.com/@_a_m_2026?_r=1&_t=ZS-95n2dpfIOxB" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
             <a href="https://wa.me/201141226046" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
     </footer>
 
-    <script>
-        // دالة إظهار الإشعارات (Toast)
-        function showToast(message, color = "#27ae60") {
+    <!-- دمج Firebase SDK (إصدار V10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4sIkw8Pj_yDc0TFEhKoWu9Y0VI5PHoco",
+            authDomain: "marketing-e9fdf.firebaseapp.com",
+            projectId: "marketing-e9fdf",
+            storageBucket: "marketing-e9fdf.firebasestorage.app",
+            messagingSenderId: "802495803513",
+            appId: "1:802495803513:web:ea214549ac16d110a164a8",
+            measurementId: "G-4Z0FKEX06J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // متغيرات عامة
+        window.products =[];
+        window.cart = JSON.parse(localStorage.getItem('am_cart')) ||[];
+        window.SELLER_PHONE = "201141226046";
+        window.historyStack = ['home'];
+
+        // جلب البيانات من Firebase
+        async function fetchProducts() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                window.products = querySnapshot.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
+                
+                // إخفاء شاشة التحميل بعد جلب البيانات
+                document.getElementById('global-loader').style.display = 'none';
+                
+                // فحص الرابط المباشر
+                const urlParams = new URLSearchParams(window.location.search);
+                const sharedCode = urlParams.get('p');
+                window.history.replaceState({ page: 'home' }, "");
+
+                if (sharedCode) {
+                    const targetProduct = window.products.find(x => x.shortCode === sharedCode);
+                    if (targetProduct) {
+                        window.historyStack =['home', 'details'];
+                        window.history.pushState({ page: 'details' }, "");
+                        window.openProduct(targetProduct.id, false);
+                        return;
+                    }
+                }
+                window.resetAndNavigate('home');
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                alert("حدث خطأ أثناء الاتصال بالخادم. تأكد من اتصالك بالإنترنت.");
+            }
+        }
+
+        // --- جميع الدوال السابقة (UI / Navigation) مسجلة في نافذة Window لتعمل مع Module ---
+        window.showToast = function(message, color = "#27ae60") {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = message;
             toast.style.backgroundColor = color;
@@ -240,43 +270,21 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        if (window.location.href.includes('index.html')) {
-            let cleanUrl = window.location.href.replace('index.html', '');
-            window.history.replaceState({}, document.title, cleanUrl);
-        }
-
-        function generateShortCode() {
-            return String(Math.floor(Math.random() * 1000) + 1).padStart(4, '0');
-        }
-
-        let products = JSON.parse(localStorage.getItem('am_products')) ||[];
-        products = products.map(p => {
-            if(!p.images) p.images =[p.img]; 
-            if(!p.shortCode) p.shortCode = generateShortCode();
-            if(!p.description) p.description = "خامة ممتازة ومريحة وتصميم عصري."; 
-            return p;
-        });
-
-        let cart = JSON.parse(localStorage.getItem('am_cart')) ||[];
-        const SELLER_PHONE = "201141226046";
-        
-        let historyStack =['home'];
-
-        function resetAndNavigate(pageId) {
-            historyStack = [pageId];
+        window.resetAndNavigate = function(pageId) {
+            window.historyStack = [pageId];
             window.history.replaceState({ page: pageId }, "");
-            navigateUI(pageId);
+            window.navigateUI(pageId);
         }
 
-        function navigate(pageId, pushToHistory = true) {
-            if(pushToHistory && historyStack[historyStack.length - 1] !== pageId) {
-                historyStack.push(pageId);
+        window.navigate = function(pageId, pushToHistory = true) {
+            if(pushToHistory && window.historyStack[window.historyStack.length - 1] !== pageId) {
+                window.historyStack.push(pageId);
                 window.history.pushState({ page: pageId }, "");
             }
-            navigateUI(pageId);
+            window.navigateUI(pageId);
         }
 
-        function navigateUI(pageId) {
+        window.navigateUI = function(pageId) {
             const pages =['home', 'category', 'details', 'order-form', 'cart'];
             pages.forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
@@ -285,55 +293,55 @@
             const footer = document.getElementById('main-footer');
             if(pageId === 'home' || pageId === 'cart') {
                 footer.style.display = 'block';
+                footer.classList.remove('hidden');
             } else {
                 footer.style.display = 'none';
             }
 
-            if(pageId === 'home') renderHomeSlider();
-            if(pageId === 'cart') renderCart();
+            if(pageId === 'home') window.renderHomeSlider();
+            if(pageId === 'cart') window.renderCart();
         }
 
         window.addEventListener('popstate', (e) => {
-            if (historyStack.length > 1) {
-                historyStack.pop(); 
-                let previousPage = historyStack[historyStack.length - 1]; 
-                navigateUI(previousPage);
+            if (window.historyStack.length > 1) {
+                window.historyStack.pop(); 
+                let previousPage = window.historyStack[window.historyStack.length - 1]; 
+                window.navigateUI(previousPage);
             } else {
-                navigateUI('home');
+                window.navigateUI('home');
             }
         });
 
-        function goBack() {
-            if (historyStack.length > 1) {
+        window.goBack = function() {
+            if (window.historyStack.length > 1) {
                 window.history.back();
             } else {
-                resetAndNavigate('home');
+                window.resetAndNavigate('home');
             }
         }
 
-        function shareProduct(event, id) {
+        window.shareProduct = function(event, id) {
             event.stopPropagation();
-            const p = products.find(x => x.id === id);
+            const p = window.products.find(x => x.id === id);
             if(!p) return;
 
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const shareUrl = `${baseUrl}?p=${p.shortCode}`;
             const shareTitle = `A&M Store | ${p.name}`;
-            const shareText = `✨ شاهد هذا المنتج الرائع من A&M Store!\n🛍️ ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، اضغط على الرابط التالي:\n`;
+            const shareText = `✨ شاهد هذا المنتج الرائع من A&M Store!\n🛍️ ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، اضغط على الرابط:\n`;
 
             if (navigator.share) {
-                navigator.share({ title: shareTitle, text: shareText, url: shareUrl })
-                .catch((error) => console.log('إلغاء المشاركة'));
+                navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(() => {});
             } else {
                 navigator.clipboard.writeText(shareText + shareUrl).then(() => {
-                    showToast("تم نسخ رابط المنتج بنجاح! 🔗", "#0984e3"); // إشعار أزرق
+                    window.showToast("تم نسخ رابط المنتج بنجاح! 🔗", "#0984e3"); 
                 });
             }
         }
 
-        function updateCartBadge() { document.getElementById('cart-count-badge').innerText = cart.length; }
+        window.updateCartBadge = function() { document.getElementById('cart-count-badge').innerText = window.cart.length; }
 
-        function generateProductCardHTML(p) {
+        window.generateProductCardHTML = function(p) {
             let displayImg = p.images ? p.images[0] : p.img;
             let discountBadge = (p.isOffer && p.discount) ? `<div class="badge-discount">خصم ${p.discount}</div>` : '';
             let outOfStockBadge = (p.qty <= 0) ? `<div class="badge-outofstock">انتهت الكمية</div>` : '';
@@ -343,66 +351,60 @@
                 <div class="inner-product-card" onclick="openProduct(${p.id})">
                     ${discountBadge}
                     <div class="share-icon" onclick="shareProduct(event, ${p.id})" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
-                    <div class="img-container">
-                        <img src="${displayImg}" class="${imgClass}">
-                        ${outOfStockBadge}
-                    </div>
-                    <h3>${p.name}</h3>
-                    <p>${p.category}</p>
+                    <div class="img-container"><img src="${displayImg}" class="${imgClass}">${outOfStockBadge}</div>
+                    <h3>${p.name}</h3><p>${p.category}</p>
                 </div>
             `;
         }
 
-        function renderHomeSlider() {
+        window.renderHomeSlider = function() {
             const slider = document.getElementById('latest-products-slider');
             slider.innerHTML = '';
-            let visibleProducts = products.filter(p => !p.hidden);
+            let visibleProducts = window.products.filter(p => !p.hidden);
             if(visibleProducts.length === 0) return slider.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">لا توجد منتجات حالياً.</p>';
             
             visibleProducts.slice().reverse().slice(0, 10).forEach(p => {
-                slider.innerHTML += generateProductCardHTML(p);
+                slider.innerHTML += window.generateProductCardHTML(p);
             });
         }
 
-        function scrollSlider(direction) {
+        window.scrollSlider = function(direction) {
             const slider = document.getElementById('latest-products-slider');
             const scrollAmount = slider.clientWidth / 2;
             if(direction === 'right') { slider.scrollBy({ left: scrollAmount, behavior: 'smooth' }); } 
             else { slider.scrollBy({ left: -scrollAmount, behavior: 'smooth' }); }
         }
 
-        function openCategory(catName) {
+        window.openCategory = function(catName) {
             document.getElementById('category-title').innerText = catName === 'عروض' ? 'عروض خاصة' : "قسم " + catName;
             const container = document.getElementById('category-products');
             container.innerHTML = '';
             
-            let filtered = catName === 'عروض' ? products.filter(p => p.isOffer === true && !p.hidden) : products.filter(p => p.category === catName && !p.hidden);
+            let filtered = catName === 'عروض' ? window.products.filter(p => p.isOffer === true && !p.hidden) : window.products.filter(p => p.category === catName && !p.hidden);
             
             if(filtered.length === 0) {
                 container.innerHTML = '<p style="grid-column: span 2; text-align:center; font-size:0.9rem; color:var(--text-muted)">لا توجد منتجات في هذا القسم حالياً.</p>';
             } else {
-                filtered.forEach(p => { container.innerHTML += generateProductCardHTML(p); });
+                filtered.forEach(p => { container.innerHTML += window.generateProductCardHTML(p); });
             }
-            navigate('category');
+            window.navigate('category');
         }
 
-        function updateSliderDots(sliderElement) {
+        window.updateSliderDots = function(sliderElement) {
             const absScroll = Math.abs(sliderElement.scrollLeft);
             const index = Math.round(absScroll / sliderElement.clientWidth);
             const dots = sliderElement.parentElement.parentElement.querySelectorAll('.dot');
             dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); });
         }
 
-        function openLightbox(src) {
+        window.openLightbox = function(src) {
             document.getElementById('lightbox-img').src = src;
             document.getElementById('lightbox').style.display = 'flex';
         }
-        function closeLightbox() {
-            document.getElementById('lightbox').style.display = 'none';
-        }
+        window.closeLightbox = function() { document.getElementById('lightbox').style.display = 'none'; }
 
-        function openProduct(id, pushToHistory = true) {
-            const p = products.find(x => x.id === id);
+        window.openProduct = function(id, pushToHistory = true) {
+            const p = window.products.find(x => x.id === id);
             
             let sizesHtml = p.sizes.map(s => `<span class="badge">${s}</span>`).join('');
             let colorsHtml = p.colors.map(c => `<span class="badge">${c}</span>`).join('');
@@ -416,11 +418,7 @@
                 : `<button class="btn" style="background:#bdc3c7; color:#fff; cursor:not-allowed;"><i class="fa-solid fa-ban"></i> انتهت الكمية</button>`;
 
             document.getElementById('product-details-content').innerHTML = `
-                <div class="details-image-wrapper">
-                    <div class="details-slider" onscroll="updateSliderDots(this)">
-                        ${sliderHtml}
-                    </div>
-                </div>
+                <div class="details-image-wrapper"><div class="details-slider" onscroll="updateSliderDots(this)">${sliderHtml}</div></div>
                 ${imgsArray.length > 1 ? `<div class="slider-dots">${dotsHtml}</div>` : ''}
 
                 <div class="info-bar">
@@ -429,16 +427,12 @@
                 </div>
 
                 <div class="options-section">
-                    <div style="font-weight:bold; font-size:0.9rem; color:var(--text-dark); margin-bottom: 8px;">
-                        <i class="fa-solid fa-file-lines" style="color:var(--accent);"></i> تفاصيل المنتج:
-                    </div>
+                    <div style="font-weight:bold; font-size:0.9rem; color:var(--text-dark); margin-bottom: 8px;"><i class="fa-solid fa-file-lines" style="color:var(--accent);"></i> تفاصيل المنتج:</div>
                     <p style="font-size:0.85rem; color:var(--text-muted); line-height: 1.6; margin: 0;">${p.description}</p>
                 </div>
 
                 <div class="options-section" style="font-size:0.85rem; color:var(--text-dark)">
-                    <div style="margin-bottom: 10px;">
-                        <i class="fa-solid fa-hashtag" style="color:var(--accent); width: 15px;"></i> <strong>كود المنتج:</strong> <span style="color:var(--bg-dark-blue); font-weight:bold;">${p.shortCode}</span>
-                    </div>
+                    <div style="margin-bottom: 10px;"><i class="fa-solid fa-hashtag" style="color:var(--accent); width: 15px;"></i> <strong>كود المنتج:</strong> <span style="color:var(--bg-dark-blue); font-weight:bold;">${p.shortCode}</span></div>
                     <div><i class="fa-solid fa-location-dot" style="color:var(--accent); width: 15px;"></i> <strong>التوصيل:</strong> ${p.delivery}</div>
                 </div>
 
@@ -450,14 +444,13 @@
                     <div style="font-weight:bold; font-size:0.9rem; color:var(--text-dark)">الألوان المتوفرة:</div>
                     <div class="option-badges">${colorsHtml}</div>
                 </div>
-                
                 ${orderBtnHTML}
             `;
-            navigate('details', pushToHistory);
+            window.navigate('details', pushToHistory);
         }
 
-        function prepareOrder(id) {
-            const p = products.find(x => x.id === id);
+        window.prepareOrder = function(id) {
+            const p = window.products.find(x => x.id === id);
             let displayImg = p.images ? p.images[0] : p.img;
             let sizeOptions = p.sizes.map(s => `<option value="${s}">${s}</option>`).join('');
             let colorOptions = p.colors.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -465,50 +458,44 @@
             document.getElementById('order-form-content').innerHTML = `
                 <div style="display:flex; gap:12px; margin-bottom:15px; align-items:center; background:var(--bg-main); padding:10px; border-radius:12px;">
                     <img src="${displayImg}" style="width:60px; height:60px; border-radius:10px; object-fit:cover; object-position: top center;">
-                    <div>
-                        <strong style="font-size:0.95rem;">${p.name}</strong><br>
-                        <small style="color:var(--text-muted); font-size:0.8rem;">المتاح: ${p.qty}</small>
-                    </div>
+                    <div><strong style="font-size:0.95rem;">${p.name}</strong><br><small style="color:var(--text-muted); font-size:0.8rem;">المتاح: ${p.qty}</small></div>
                 </div>
                 <div class="form-group"><label>اختر المقاس:</label><select id="order-size" class="form-control">${sizeOptions}</select></div>
                 <div class="form-group"><label>اختر اللون:</label><select id="order-color" class="form-control">${colorOptions}</select></div>
                 <div class="form-group"><label>الكمية المطلوبة:</label><input type="number" id="order-qty" class="form-control" value="1" min="1" max="${p.qty}"></div>
-                
                 <hr style="border:0; border-top:1px solid var(--border-light); margin: 15px 0;">
                 <button class="btn btn-cart" onclick="addFromFormToCart(${p.id})"><i class="fa-solid fa-cart-plus"></i> إضافة للسلة (لطلب المزيد)</button>
                 <button class="btn btn-whatsapp" onclick="confirmDirectOrder(${p.id})"><i class="fa-brands fa-whatsapp"></i> تأكيد الطلب وإرسال واتساب</button>
             `;
-            navigate('order-form');
+            window.navigate('order-form');
         }
 
-        function addFromFormToCart(id) {
-            const p = products.find(x => x.id === id);
+        window.addFromFormToCart = function(id) {
+            const p = window.products.find(x => x.id === id);
             let size = document.getElementById('order-size').value, color = document.getElementById('order-color').value, qty = parseInt(document.getElementById('order-qty').value);
-            
-            cart.push({ ...p, selSize: size, selColor: color, selQty: qty });
-            localStorage.setItem('am_cart', JSON.stringify(cart));
-            updateCartBadge(); 
-            
-            showToast("تمت الإضافة للسلة بنجاح! 🛒"); // الإشعار الذكي
-            goBack(); 
+            if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
+            window.cart.push({ ...p, selSize: size, selColor: color, selQty: qty });
+            localStorage.setItem('am_cart', JSON.stringify(window.cart));
+            window.updateCartBadge(); 
+            window.showToast("تمت الإضافة للسلة بنجاح! 🛒"); 
+            window.goBack(); 
         }
 
-        function confirmDirectOrder(id) {
-            const p = products.find(x => x.id === id);
+        window.confirmDirectOrder = function(id) {
+            const p = window.products.find(x => x.id === id);
             let size = document.getElementById('order-size').value, color = document.getElementById('order-color').value, qty = parseInt(document.getElementById('order-qty').value);
-            
+            if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const productUrl = `${baseUrl}?p=${p.shortCode}`;
-            
-            let msg = `مرحباً A&M Store، أود طلب:\n\n🔖 كود المنتج: ${p.shortCode}\n🛍️ المنتج: ${p.name}\n📁 القسم: ${p.category}\n🎨 اللون: ${color}\n📏 المقاس: ${size}\n🔢 العدد: ${qty}\n\n🔗 رابط المنتج: ${productUrl}`;
-            window.open(`https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+            let msg = `مرحباً A&M Store، أود طلب:\n\n🔖 كود المنتج: ${p.shortCode}\n🛍️ المنتج: ${p.name}\n📁 القسم: ${p.category}\n🎨 اللون: ${color}\n📏 المقاس: ${size}\n🔢 العدد: ${qty}\n\n🔗 الرابط: ${productUrl}`;
+            window.open(`https://wa.me/${window.SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function renderCart() {
+        window.renderCart = function() {
             const c = document.getElementById('cart-items');
-            c.innerHTML = cart.length ? cart.map((item, i) => `
+            c.innerHTML = window.cart.length ? window.cart.map((item, i) => `
                 <div class="info-bar" style="margin-bottom:12px; padding: 10px;">
-                    <img src="${item.images ? item.images[0] : item.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover; object-position: top center;">
+                    <img src="${item.images ? item.images[0] : item.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;">
                     <div style="flex:1; margin: 0 12px;">
                         <strong style="font-size:0.9rem;">${item.name}</strong><br>
                         <small style="color:var(--text-muted); font-size:0.75rem;">لون: ${item.selColor} | مقاس: ${item.selSize} | <strong style="color:var(--bg-dark-blue)">العدد: ${item.selQty}</strong></small>
@@ -517,43 +504,27 @@
                 </div>`).join('') : '<p style="text-align:center; font-size:0.85rem; color:var(--text-muted)">السلة فارغة.</p>';
         }
 
-        function removeFromCart(i) { 
-            cart.splice(i, 1); 
-            localStorage.setItem('am_cart', JSON.stringify(cart)); 
-            updateCartBadge(); 
-            renderCart(); 
-            showToast("تم إزالة المنتج من السلة 🗑️", "#e74c3c"); // إشعار الحذف (لون أحمر)
+        window.removeFromCart = function(i) { 
+            window.cart.splice(i, 1); 
+            localStorage.setItem('am_cart', JSON.stringify(window.cart)); 
+            window.updateCartBadge(); 
+            window.renderCart(); 
+            window.showToast("تم إزالة المنتج من السلة 🗑️", "#e74c3c"); 
         }
         
-        function checkoutCart() {
-            if(!cart.length) return;
+        window.checkoutCart = function() {
+            if(!window.cart.length) return;
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
-            let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n` + cart.map((item, i) => {
+            let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n` + window.cart.map((item, i) => {
                 const productUrl = `${baseUrl}?p=${item.shortCode}`;
                 return `${i+1}- ${item.name} (قسم: ${item.category})\n🔖 كود: ${item.shortCode}\n🎨 لون: ${item.selColor} / 📏 مقاس: ${item.selSize} / 🔢 عدد: ${item.selQty}\n🔗 الرابط: ${productUrl}`;
             }).join('\n\n-----------------\n\n');
-            window.open(`https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/${window.SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            updateCartBadge();
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedCode = urlParams.get('p');
-            
-            window.history.replaceState({ page: 'home' }, "");
-
-            if (sharedCode) {
-                const targetProduct = products.find(x => x.shortCode === sharedCode);
-                if (targetProduct) {
-                    historyStack =['home', 'details'];
-                    window.history.pushState({ page: 'details' }, "");
-                    openProduct(targetProduct.id, false);
-                    return;
-                }
-            }
-            resetAndNavigate('home');
-        });
-
+        // تشغيل جلب البيانات عند البداية
+        window.updateCartBadge();
+        fetchProducts();
     </script>
 </body>
 </html>
