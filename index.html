@@ -366,15 +366,21 @@
         }
 
         window.renderHomeSlider = function() {
-            const slider = document.getElementById('latest-products-slider');
-            slider.innerHTML = '';
-            let visibleProducts = window.products.filter(p => !p.hidden);
-            if(visibleProducts.length === 0) return slider.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">لا توجد منتجات حالياً.</p>';
+    const slider = document.getElementById('latest-products-slider');
+    slider.innerHTML = '';
+    let visibleProducts = window.products.filter(p => !p.hidden);
+    if(visibleProducts.length === 0) return slider.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">لا توجد منتجات حالياً.</p>';
 
-            visibleProducts.slice().reverse().slice(0, 10).forEach(p => {
-                slider.innerHTML += window.generateProductCardHTML(p);
-            });
-        }
+    // السطر ده بيعكس المنتجات كلها عشان الجديد يبقى الأول، وبعدين بيقص أول 10 بس!
+    visibleProducts.slice().reverse().slice(0, 10).forEach(p => {
+        slider.innerHTML += window.generateProductCardHTML(p);
+    });
+
+    // السطر ده لضمان بدء السكرول من اليمين
+    setTimeout(() => {
+        slider.scrollLeft = 0;
+    }, 10);
+}
 
         window.scrollSlider = function(direction) {
             const slider = document.getElementById('latest-products-slider');
