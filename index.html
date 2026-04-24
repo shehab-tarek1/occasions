@@ -31,7 +31,9 @@
         .cart-icon:hover { color: var(--accent); }
         .cart-count { position: absolute; top: -6px; right: -8px; background: #e74c3c; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 6px; font-weight: bold;}
 
-        main { padding: 20px 15px; width: 100%; max-width: 800px; flex: 1; }
+        /* إضافة تأثير النعومة للصفحات */
+        main { padding: 20px 15px; width: 100%; max-width: 800px; flex: 1; animation: fadeInPage 0.25s ease-out; }
+        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hidden { display: none !important; }
 
         .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
@@ -96,7 +98,7 @@
         .form-group label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--text-dark); font-size: 0.9rem;}
         .form-control { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem; background: var(--bg-main); outline: none;}
 
-        .cart-total-box { background: var(--bg-dark-blue); color: white; padding: 15px; border-radius: 15px; text-align: center; font-size: 1.1rem; font-weight: bold; margin-top: 20px; box-shadow: var(--shadow);}
+        .cart-total-box { background: var(--bg-dark-blue); color: white; padding: 10px; border-radius: 12px; text-align: center; font-size: 0.95rem; font-weight: bold; margin-top: 15px; box-shadow: var(--shadow);}
 
         /* تنسيقات القوائم المنسدلة المخصصة */
         .custom-select-wrapper { position: relative; margin-bottom: 15px; }
@@ -231,15 +233,26 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.products = [];
-        window.cart = JSON.parse(localStorage.getItem('am_cart')) || [];
+        window.products =[];
+        window.cart = JSON.parse(localStorage.getItem('am_cart')) ||[];
         window.SELLER_PHONE = "201141226046";
         window.historyStack = ['home'];
+
+        // دالة ذكية لتحجيم الصور لتسريع الموقع
+        window.optimizeImage = function(url, width) {
+            if (!url) return '';
+            if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+                return url.replace('/upload/', `/upload/c_scale,w_${width}/`);
+            }
+            if (url.includes('images.pexels.com')) {
+                return url.replace(/w=\d+/, `w=${width}`);
+            }
+            return url;
+        }
 
         async function fetchProducts() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
-                // 🔴 التعديل الأول: ضمان وجود حقل الـ ID لتفادي الأعطال
                 window.products = querySnapshot.docs.map(doc => ({ id: doc.id, firebaseId: doc.id, ...doc.data() }));
 
                 document.getElementById('global-loader').style.display = 'none';
@@ -249,10 +262,9 @@
                 window.history.replaceState({ page: 'home' }, "");
 
                 if (sharedCode) {
-                    // 🔴 التعديل الثاني: توحيد نوع البحث ليطابق النصوص مع الأرقام
                     const targetProduct = window.products.find(x => String(x.shortCode) === String(sharedCode));
                     if (targetProduct) {
-                        window.historyStack = ['home', 'details'];
+                        window.historyStack =['home', 'details'];
                         window.history.pushState({ page: 'details' }, "");
                         window.openProduct(targetProduct.id, false);
                         return;
@@ -291,7 +303,9 @@
             const pages = ['home', 'category', 'details', 'cart'];
             pages.forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // إيقاف السكرول الناعم هنا لمنع التقطيع أثناء التنقل
+            window.scrollTo({ top: 0, behavior: 'instant' });
 
             const footer = document.getElementById('main-footer');
             if(pageId === 'home' || pageId === 'cart') {
@@ -348,17 +362,16 @@
         window.updateCartBadge = function() { document.getElementById('cart-count-badge').innerText = window.cart.length; }
 
         window.generateProductCardHTML = function(p) {
-            let displayImg = p.images ? p.images[0] : p.img;
+            let displayImg = window.optimizeImage(p.images ? p.images[0] : p.img, 400);
             let discountBadge = (p.isOffer && p.discount) ? `<div class="badge-discount">خصم ${p.discount}</div>` : '';
             let outOfStockBadge = (p.qty <= 0) ? `<div class="badge-outofstock">انتهت الكمية</div>` : '';
             let imgClass = (p.qty <= 0) ? 'img-outofstock' : '';
 
-            // 🔴 التعديل الثالث: إضافة علامات تنصيص للـ id لتفادي أخطاء الـ Syntax
             return `
                 <div class="inner-product-card" onclick="openProduct('${p.id}')">
                     ${discountBadge}
                     <div class="share-icon" onclick="shareProduct(event, '${p.id}')" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
-                    <div class="img-container"><img src="${displayImg}" class="${imgClass}">${outOfStockBadge}</div>
+                    <div class="img-container"><img src="${displayImg}" class="${imgClass}" loading="lazy">${outOfStockBadge}</div>
                     <div class="product-price-badge">${p.price} ج.م</div>
                     <h3>${p.name}</h3><p>${p.category}</p>
                 </div>
@@ -366,21 +379,25 @@
         }
 
         window.renderHomeSlider = function() {
-    const slider = document.getElementById('latest-products-slider');
-    slider.innerHTML = '';
-    let visibleProducts = window.products.filter(p => !p.hidden);
-    if(visibleProducts.length === 0) return slider.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">لا توجد منتجات حالياً.</p>';
+            const slider = document.getElementById('latest-products-slider');
+            let visibleProducts = window.products.filter(p => !p.hidden);
+            
+            if(visibleProducts.length === 0) {
+                slider.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">لا توجد منتجات حالياً.</p>';
+                return;
+            }
 
-    // السطر ده بيعكس المنتجات كلها عشان الجديد يبقى الأول، وبعدين بيقص أول 10 بس!
-    visibleProducts.slice().reverse().slice(0, 10).forEach(p => {
-        slider.innerHTML += window.generateProductCardHTML(p);
-    });
+            visibleProducts.sort((a, b) => {
+                let dateA = a.createdAt ? (a.createdAt.seconds || new Date(a.createdAt).getTime()) : 0;
+                let dateB = b.createdAt ? (b.createdAt.seconds || new Date(b.createdAt).getTime()) : 0;
+                return dateB - dateA;
+            });
 
-    // السطر ده لضمان بدء السكرول من اليمين
-    setTimeout(() => {
-        slider.scrollLeft = 0;
-    }, 10);
-}
+            // الحقن دفعة واحدة لمنع اللاج
+            slider.innerHTML = visibleProducts.slice(0, 10).map(p => window.generateProductCardHTML(p)).join('');
+
+            setTimeout(() => { slider.scrollLeft = 0; }, 10);
+        }
 
         window.scrollSlider = function(direction) {
             const slider = document.getElementById('latest-products-slider');
@@ -392,6 +409,7 @@
         window.openCategory = function(catName) {
             document.getElementById('category-title').innerText = catName === 'عروض' ? 'عروض خاصة' : "قسم " + catName;
             const container = document.getElementById('category-products');
+            
             container.innerHTML = '';
 
             let filtered = catName === 'عروض' ? window.products.filter(p => p.isOffer === true && !p.hidden) : window.products.filter(p => p.category === catName && !p.hidden);
@@ -399,7 +417,8 @@
             if(filtered.length === 0) {
                 container.innerHTML = '<p style="grid-column: span 2; text-align:center; font-size:0.9rem; color:var(--text-muted)">لا توجد منتجات في هذا القسم حالياً.</p>';
             } else {
-                filtered.forEach(p => { container.innerHTML += window.generateProductCardHTML(p); });
+                // الحقن دفعة واحدة لمنع اللاج
+                container.innerHTML = filtered.map(p => window.generateProductCardHTML(p)).join('');
             }
             window.navigate('category');
         }
@@ -418,7 +437,6 @@
 
         window.closeLightbox = function() { document.getElementById('lightbox').style.display = 'none'; }
 
-        // دوال القوائم المنسدلة المخصصة
         window.toggleDropdown = function(id) {
             document.querySelectorAll('.custom-select-list').forEach(el => {
                 if(el.id !== id) el.classList.remove('show');
@@ -432,7 +450,6 @@
             document.getElementById(`${type}-dropdown`).classList.remove('show');
         }
 
-        // إغلاق القوائم عند الضغط في أي مكان بالشاشة
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.custom-select-wrapper')) {
                 document.querySelectorAll('.custom-select-list').forEach(el => el.classList.remove('show'));
@@ -441,20 +458,26 @@
 
         window.openProduct = function(id, pushToHistory = true) {
             const p = window.products.find(x => String(x.id) === String(id));
-            
-            // 🔴 التعديل الرابع: الحماية من عرض شاشة بيضاء إذا لم يجد المنتج
+
             if (!p) {
                 window.resetAndNavigate('home');
                 return;
             }
 
+            let pubDate = "أضيف حديثاً";
+            if (p.createdAt) {
+                try {
+                    let d = p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt);
+                    pubDate = d.toLocaleDateString('ar-EG') + ' - ' + d.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+                } catch(e) {}
+            }
+
             let imgsArray = p.images && p.images.length > 0 ? p.images.slice(0, 7) : [p.img];
-            let sliderHtml = imgsArray.map(imgSrc => `<img src="${imgSrc}" onclick="openLightbox(this.src)">`).join('');
+            let sliderHtml = imgsArray.map(imgSrc => `<img src="${window.optimizeImage(imgSrc, 500)}" onclick="openLightbox('${window.optimizeImage(imgSrc, 800)}')">`).join('');
             let dotsHtml = imgsArray.map((_, i) => `<span class="dot ${i===0 ? 'active' : ''}"></span>`).join('');
 
-            // 🔴 التعديل الخامس: الحماية من انكسار الصفحة إذا لم يوجد ألوان أو مقاسات
-            let safeSizes = p.sizes || [];
-            let safeColors = p.colors || [];
+            let safeSizes = p.sizes ||[];
+            let safeColors = p.colors ||[];
 
             let sizeItems = safeSizes.map(s => `<div class="custom-select-item" onclick="selectCustomOption('size', '${s}')">${s}</div>`).join('');
             let colorItems = safeColors.map(c => `<div class="custom-select-item" onclick="selectCustomOption('color', '${c}')">${c}</div>`).join('');
@@ -462,7 +485,6 @@
             let defaultSize = safeSizes.length > 0 ? safeSizes[0] : '';
             let defaultColor = safeColors.length > 0 ? safeColors[0] : '';
 
-            // تجهيز قسم الطلب والأزرار
             let orderSectionHTML = '';
             if (p.qty > 0) {
                 orderSectionHTML = `
@@ -516,12 +538,15 @@
                 <div class="details-image-wrapper"><div class="details-slider" onscroll="updateSliderDots(this)">${sliderHtml}</div></div>
                 ${imgsArray.length > 1 ? `<div class="slider-dots">${dotsHtml}</div>` : ''}
 
-                <div class="info-bar">
+                <div class="info-bar" style="align-items: flex-start;">
                     <div>
                         <strong style="font-size:0.95rem; display:block; margin-bottom:5px;">${p.name}</strong> 
                         <span style="color:var(--accent); font-weight:bold; font-size:1.1rem;">${p.price} ج.م</span>
                     </div>
-                    <span style="color:${p.qty > 0 ? 'var(--bg-dark-blue)' : '#e74c3c'}; font-weight:bold; font-size:0.85rem;">متاح: ${p.qty}</span>
+                    <div style="text-align: left; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                        <span style="font-size: 0.55rem; color: var(--silver); direction: ltr;">${pubDate}</span>
+                        <span style="color:${p.qty > 0 ? 'var(--bg-dark-blue)' : '#e74c3c'}; font-weight:bold; font-size:0.8rem; background: var(--bg-main); padding: 3px 8px; border-radius: 10px;">متاح: ${p.qty}</span>
+                    </div>
                 </div>
 
                 <div class="options-section">
@@ -584,7 +609,7 @@
                 totalCartPrice += itemTotal;
                 return `
                 <div class="info-bar" style="margin-bottom:12px; padding: 10px;">
-                    <img src="${item.images ? item.images[0] : item.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;">
+                    <img src="${window.optimizeImage(item.images ? item.images[0] : item.img, 100)}" style="width:50px; height:50px; border-radius:10px; object-fit:cover; border: 1px solid var(--border-light);">
                     <div style="flex:1; margin: 0 12px;">
                         <strong style="font-size:0.9rem;">${item.name}</strong><br>
                         <small style="color:var(--text-muted); font-size:0.75rem;">لون: ${item.selColor} | مقاس: ${item.selSize} | <strong style="color:var(--bg-dark-blue)">العدد: ${item.selQty}</strong></small><br>
