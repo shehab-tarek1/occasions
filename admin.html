@@ -32,7 +32,6 @@
         .form-control:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(9, 132, 227, 0.3); }
         .form-control:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* أزرار الاختيار للمقاسات والألوان */
         .selection-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
         .selection-badge { padding: 8px 15px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-main); color: var(--text-muted); font-size: 0.85rem; cursor: pointer; transition: 0.3s; user-select: none; }
         .selection-badge:hover { border-color: var(--accent); }
@@ -86,6 +85,13 @@
             <div class="form-grid">
                 <div class="form-group full-width"><label>اسم المنتج</label><input type="text" id="p-name" class="form-control"></div>
                 <div class="form-group full-width"><label>وصف المنتج</label><textarea id="p-desc" class="form-control" rows="3"></textarea></div>
+                
+                <!-- حقل السعر الجديد -->
+                <div class="form-group">
+                    <label>السعر (جنية مصري)</label>
+                    <input type="number" id="p-price" class="form-control" placeholder="مثال: 250" min="0">
+                </div>
+
                 <div class="form-group">
                     <label>القسم</label>
                     <select id="p-category" class="form-control">
@@ -95,6 +101,7 @@
                         <option value="عروض">عروض خاصة</option>
                     </select>
                 </div>
+                
                 <div class="form-group"><label>الكمية المتاحة</label><input type="number" id="p-qty" class="form-control" min="0"></div>
                 
                 <div class="form-group" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
@@ -109,20 +116,14 @@
                     <small style="color:var(--text-muted); display:block; margin-top:5px;">سيتم رفعها مباشرة وتصغير حجمها عبر Cloudinary.</small>
                 </div>
 
-                <!-- قسم اختيار المقاسات الجديد -->
                 <div class="form-group full-width">
                     <label><i class="fa-solid fa-ruler"></i> اختر المقاسات المتاحة:</label>
-                    <div id="size-options" class="selection-group">
-                        <!-- سيتم حقن المقاسات هنا عبر الجافاسكريبت -->
-                    </div>
+                    <div id="size-options" class="selection-group"></div>
                 </div>
 
-                <!-- قسم اختيار الألوان الجديد -->
                 <div class="form-group full-width">
                     <label><i class="fa-solid fa-palette"></i> اختر الألوان المتاحة:</label>
-                    <div id="color-options" class="selection-group">
-                        <!-- سيتم حقن الألوان هنا عبر الجافاسكريبت -->
-                    </div>
+                    <div id="color-options" class="selection-group"></div>
                 </div>
 
                 <div class="form-group full-width"><label>أماكن التوصيل المتاحة</label><input type="text" id="p-delivery" class="form-control" value="جميع المحافظات"></div>
@@ -162,16 +163,13 @@
         window.products =[];
         window.editingId = null;
 
-        // --- بيانات المقاسات والألوان ---
         const availableColors =["أسود", "أبيض", "كحلي", "رصاصي", "رمادي فاتح", "أحمر", "نبيتي", "أزرق", "أزرق سماوي", "لبني", "أخضر", "زيتي", "أصفر", "مسطردة", "جملي", "بيج", "بني", "هافان", "كشمير", "وردي (بينك)", "فوشيا", "بنفسجي", "موف", "برتقالي", "ذهبي", "فضي", "متعدد الألوان"];
-        
         const availableSizes = {
             "مقاسات الحروف (رجالي / حريمي):":["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "6XL", "Free Size"],
             "مقاسات الأرقام (بناطيل):":["30", "32", "34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54"],
             "مقاسات الأطفال:":["حديثي الولادة", "سنة", "سنتين", "3 سنوات", "4 سنوات", "6 سنوات", "8 سنوات", "10 سنوات", "12 سنة", "14 سنة"]
         };
 
-        // دالة عرض أزرار المقاسات والألوان
         function renderSelectionOptions() {
             const colorContainer = document.getElementById('color-options');
             colorContainer.innerHTML = availableColors.map(c => `<span class="selection-badge color-badge" onclick="this.classList.toggle('selected')">${c}</span>`).join('');
@@ -184,8 +182,6 @@
             }
             sizeContainer.innerHTML = sizeHtml;
         }
-
-        // تشغيل الدالة فوراً
         renderSelectionOptions();
 
         onAuthStateChanged(auth, (user) => {
@@ -241,6 +237,7 @@
         window.saveProduct = async function() {
             const name = document.getElementById('p-name').value;
             const desc = document.getElementById('p-desc').value;
+            const price = document.getElementById('p-price').value; // جلب السعر
             const category = document.getElementById('p-category').value;
             const qty = document.getElementById('p-qty').value;
             const isOffer = document.getElementById('p-isOffer').checked;
@@ -248,12 +245,11 @@
             const delivery = document.getElementById('p-delivery').value;
             const fileInput = document.getElementById('p-image');
 
-            // جلب المقاسات والألوان المحددة من الأزرار
             const sizes = Array.from(document.querySelectorAll('.size-badge.selected')).map(b => b.innerText);
             const colors = Array.from(document.querySelectorAll('.color-badge.selected')).map(b => b.innerText);
 
-            if(!name || !qty || sizes.length === 0 || colors.length === 0 || !desc) {
-                alert("يرجى ملء جميع البيانات الأساسية والتأكد من اختيار مقاس ولون واحد على الأقل!"); return;
+            if(!name || !price || !qty || sizes.length === 0 || colors.length === 0 || !desc) {
+                alert("يرجى ملء جميع البيانات الأساسية (الاسم، السعر، الوصف، الكمية، المقاسات، والألوان)!"); return;
             }
 
             if(!window.editingId && fileInput.files.length === 0) {
@@ -277,7 +273,7 @@
 
                 if (window.editingId) {
                     const productRef = doc(db, "products", window.editingId);
-                    let updateData = { name, description: desc, category, qty: parseInt(qty), isOffer, discount, sizes, colors, delivery };
+                    let updateData = { name, description: desc, price: parseFloat(price), category, qty: parseInt(qty), isOffer, discount, sizes, colors, delivery };
                     if(newImageUrls.length > 0) {
                         updateData.images = newImageUrls;
                         updateData.img = newImageUrls[0];
@@ -289,7 +285,7 @@
                     const newProduct = {
                         id: Date.now(), 
                         shortCode: generateShortCode(),
-                        name, description: desc, category, qty: parseInt(qty), isOffer, discount, sizes, colors, delivery,
+                        name, description: desc, price: parseFloat(price), category, qty: parseInt(qty), isOffer, discount, sizes, colors, delivery,
                         images: newImageUrls, img: newImageUrls[0], hidden: false
                     };
                     await addDoc(collection(db, "products"), newProduct);
@@ -316,21 +312,16 @@
 
             document.getElementById('p-name').value = p.name;
             document.getElementById('p-desc').value = p.description || "";
+            document.getElementById('p-price').value = p.price || 0; // تعبئة السعر
             document.getElementById('p-category').value = p.category;
             document.getElementById('p-qty').value = p.qty;
             document.getElementById('p-isOffer').checked = p.isOffer || false;
             document.getElementById('p-discount').value = p.discount || "";
             document.getElementById('p-delivery').value = p.delivery;
             
-            // تحديد المقاسات والألوان المحفوظة مسبقاً
             document.querySelectorAll('.selection-badge').forEach(b => b.classList.remove('selected'));
-            
-            document.querySelectorAll('.size-badge').forEach(b => {
-                if(p.sizes.includes(b.innerText)) b.classList.add('selected');
-            });
-            document.querySelectorAll('.color-badge').forEach(b => {
-                if(p.colors.includes(b.innerText)) b.classList.add('selected');
-            });
+            document.querySelectorAll('.size-badge').forEach(b => { if(p.sizes.includes(b.innerText)) b.classList.add('selected'); });
+            document.querySelectorAll('.color-badge').forEach(b => { if(p.colors.includes(b.innerText)) b.classList.add('selected'); });
             
             window.toggleDiscount();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -346,6 +337,7 @@
 
         window.clearForm = function() {
             document.getElementById('p-name').value = ''; document.getElementById('p-desc').value = '';
+            document.getElementById('p-price').value = ''; // تفريغ السعر
             document.getElementById('p-qty').value = ''; document.getElementById('p-image').value = '';
             document.getElementById('p-isOffer').checked = false; document.getElementById('p-discount').value = '';
             document.querySelectorAll('.selection-badge').forEach(b => b.classList.remove('selected'));
@@ -358,6 +350,7 @@
                 <div class="product-item ${p.hidden ? 'is-hidden' : ''}">
                     <img src="${p.images && p.images.length > 0 ? p.images[0] : p.img}">
                     <div class="product-title">${p.name}</div>
+                    <div style="font-weight:bold; color:var(--accent); margin-bottom:5px;">${p.price || 0} ج.م</div>
                     <div class="product-qty">الكمية: <strong>${p.qty}</strong> | كود: ${p.shortCode}</div>
                     
                     <button class="btn-action btn-edit" onclick="editProduct('${p.firebaseId}')"><i class="fa-solid fa-pen"></i> تعديل</button>
