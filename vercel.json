@@ -3,10 +3,6 @@
     {
       "source": "/p/:code",
       "destination": "/api/share?p=:code"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
