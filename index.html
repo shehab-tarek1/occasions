@@ -328,8 +328,8 @@
             if(!p) return;
 
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
-            const shareUrl = `${baseUrl}?p=${p.shortCode}`;
-            const shareTitle = `A&M Store | ${p.name}`;
+            const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+const shareUrl = `${cleanBaseUrl}/p/${p.shortCode}`;            const shareTitle = `A&M Store | ${p.name}`;
             const shareText = ` شاهد هذا المنتج الرائع من A&M Store!\n ${p.name}\n السعر: ${p.price} ج.م\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، اضغط على الرابط:\n`;
 
             if (navigator.share) {
@@ -404,7 +404,7 @@
             document.getElementById('lightbox-img').src = src;
             document.getElementById('lightbox').style.display = 'flex';
         }
-        
+
         window.closeLightbox = function() { document.getElementById('lightbox').style.display = 'none'; }
 
         // دوال القوائم المنسدلة المخصصة
@@ -544,7 +544,8 @@
             if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
 
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
-            const productUrl = `${baseUrl}?p=${p.shortCode}`;
+            const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+const productUrl = `${cleanBaseUrl}/p/${p.shortCode}`;
             const totalPrice = p.price * qty;
 
             let msg = `مرحباً A&M Store، أود طلب:\n\n🔖 كود المنتج: ${p.shortCode}\n المنتج: ${p.name}\n القسم: ${p.category}\n اللون: ${color}\n المقاس: ${size}\n العدد: ${qty}\n إجمالي الحساب: ${totalPrice} ج.م\n\n🔗 الرابط: ${productUrl}`;
@@ -594,7 +595,8 @@
             let totalCartPrice = 0;
 
             let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n` + window.cart.map((item, i) => {
-                const productUrl = `${baseUrl}?p=${item.shortCode}`;
+                const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+const productUrl = `${cleanBaseUrl}/p/${item.shortCode}`;
                 let itemTotal = item.price * item.selQty;
                 totalCartPrice += itemTotal;
                 return `${i+1}- ${item.name} (قسم: ${item.category})\n🔖 كود: ${item.shortCode}\n لون: ${item.selColor} /  مقاس: ${item.selSize} / عدد: ${item.selQty}\n السعر: ${itemTotal} ج.م\n🔗 الرابط: ${productUrl}`;
