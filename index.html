@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A&M Store</title>
+    <meta name="description" content="تسوق أحدث الملابس بأفضل الأسعار.">
+    <meta property="og:title" content="A&M Store | متجر الأزياء الأول">
+    <meta property="og:description" content="تشكيلة رائعة من أحدث الموديلات، اطلب الآن بأفضل الأسعار.">
     <meta property="og:image" content="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* جميع أكواد الـ CSS الخاصة بك كما هي تماماً */
         :root { --bg-main: #f4f6f9; --bg-surface: #ffffff; --bg-dark-blue: #0f1c2e; --text-light: #f8f9fa; --text-dark: #2d3436; --text-muted: #636e72; --border-light: #dfe6e9; --accent: #0984e3; --silver: #b2bec3; --radius: 20px; --shadow: 0 8px 20px rgba(0,0,0,0.06); }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center;}
-        
-        /* شاشة التحميل من السيرفر */
+
         #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .spinner { border: 5px solid var(--border-light); border-top: 5px solid var(--accent); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -44,7 +46,11 @@
         .inner-product-card { position: relative; background: var(--bg-surface); border-radius: var(--radius); overflow: hidden; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--border-light); flex-shrink: 0; scroll-snap-align: start; }
         .inner-product-card .img-container { position: relative; width: 100%; height: 130px; }
         .inner-product-card img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; border-bottom: 1px solid var(--border-light);}
-        .inner-product-card h3 { padding: 10px 8px 4px; font-size: 0.85rem; color: var(--text-dark); margin: 0; }
+        
+        /* تنسيق السعر الجديد على البطاقة */
+        .product-price-badge { font-size: 0.9rem; font-weight: bold; color: var(--accent); margin: 8px 0 2px 0; }
+        
+        .inner-product-card h3 { padding: 4px 8px; font-size: 0.85rem; color: var(--text-dark); margin: 0; }
         .inner-product-card p { padding: 0 8px 10px; font-size: 0.7rem; color: var(--text-muted); margin: 0; }
         
         .badge-discount { position: absolute; top: 8px; left: 8px; background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; z-index: 5;}
@@ -90,17 +96,18 @@
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--text-dark); font-size: 0.9rem;}
         .form-control { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem; background: var(--bg-main); outline: none;}
+        
+        /* إجمالي السلة */
+        .cart-total-box { background: var(--bg-dark-blue); color: white; padding: 15px; border-radius: 15px; text-align: center; font-size: 1.1rem; font-weight: bold; margin-top: 20px; box-shadow: var(--shadow);}
     </style>
 </head>
 <body>
 
-    <!-- شاشة التحميل -->
     <div id="global-loader">
         <div class="spinner"></div>
         <h3 style="color: var(--bg-dark-blue);">جاري تحميل المتجر...</h3>
     </div>
 
-    <!-- رسالة الإشعار (Toast) -->
     <div id="toast" class="toast-notification">
         <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">تمت الإضافة</span>
     </div>
@@ -188,7 +195,8 @@
         </div>
         <div class="slider-section" style="margin-top: 10px;">
             <div id="cart-items"></div>
-            <button class="btn btn-whatsapp" onclick="checkoutCart()"><i class="fa-brands fa-whatsapp"></i> إرسال كل الطلبات واتساب</button>
+            <div id="cart-total-container"></div>
+            <button class="btn btn-whatsapp" onclick="checkoutCart()"><i class="fa-brands fa-whatsapp"></i> إرسال الطلب واتساب</button>
         </div>
     </main>
 
@@ -207,7 +215,7 @@
         </div>
     </footer>
 
-    <!-- دمج Firebase SDK (إصدار V10) -->
+    <!-- Firebase SDK (V10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -225,22 +233,18 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // متغيرات عامة
         window.products =[];
         window.cart = JSON.parse(localStorage.getItem('am_cart')) ||[];
         window.SELLER_PHONE = "201141226046";
         window.historyStack = ['home'];
 
-        // جلب البيانات من Firebase
         async function fetchProducts() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
                 window.products = querySnapshot.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
                 
-                // إخفاء شاشة التحميل بعد جلب البيانات
                 document.getElementById('global-loader').style.display = 'none';
                 
-                // فحص الرابط المباشر
                 const urlParams = new URLSearchParams(window.location.search);
                 const sharedCode = urlParams.get('p');
                 window.history.replaceState({ page: 'home' }, "");
@@ -257,11 +261,10 @@
                 window.resetAndNavigate('home');
             } catch (error) {
                 console.error("خطأ في جلب البيانات:", error);
-                alert("حدث خطأ أثناء الاتصال بالخادم. تأكد من اتصالك بالإنترنت.");
+                alert("حدث خطأ أثناء الاتصال بالخادم.");
             }
         }
 
-        // --- جميع الدوال السابقة (UI / Navigation) مسجلة في نافذة Window لتعمل مع Module ---
         window.showToast = function(message, color = "#27ae60") {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = message;
@@ -328,7 +331,7 @@
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const shareUrl = `${baseUrl}?p=${p.shortCode}`;
             const shareTitle = `A&M Store | ${p.name}`;
-            const shareText = `شاهد هذا المنتج الرائع من A&M Store!\n ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n للطلب، اضغط على الرابط:\n`;
+            const shareText = ` شاهد هذا المنتج الرائع من A&M Store!\n ${p.name}\n السعر: ${p.price} ج.م\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، اضغط على الرابط:\n`;
 
             if (navigator.share) {
                 navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(() => {});
@@ -352,6 +355,7 @@
                     ${discountBadge}
                     <div class="share-icon" onclick="shareProduct(event, ${p.id})" title="مشاركة المنتج"><i class="fa-solid fa-share-nodes"></i></div>
                     <div class="img-container"><img src="${displayImg}" class="${imgClass}">${outOfStockBadge}</div>
+                    <div class="product-price-badge">${p.price} ج.م</div>
                     <h3>${p.name}</h3><p>${p.category}</p>
                 </div>
             `;
@@ -422,7 +426,10 @@
                 ${imgsArray.length > 1 ? `<div class="slider-dots">${dotsHtml}</div>` : ''}
 
                 <div class="info-bar">
-                    <strong style="font-size:0.95rem;">${p.name}</strong> 
+                    <div>
+                        <strong style="font-size:0.95rem; display:block; margin-bottom:5px;">${p.name}</strong> 
+                        <span style="color:var(--accent); font-weight:bold; font-size:1.1rem;">${p.price} ج.م</span>
+                    </div>
                     <span style="color:${p.qty > 0 ? 'var(--bg-dark-blue)' : '#e74c3c'}; font-weight:bold; font-size:0.85rem;">متاح: ${p.qty}</span>
                 </div>
 
@@ -458,16 +465,32 @@
             document.getElementById('order-form-content').innerHTML = `
                 <div style="display:flex; gap:12px; margin-bottom:15px; align-items:center; background:var(--bg-main); padding:10px; border-radius:12px;">
                     <img src="${displayImg}" style="width:60px; height:60px; border-radius:10px; object-fit:cover; object-position: top center;">
-                    <div><strong style="font-size:0.95rem;">${p.name}</strong><br><small style="color:var(--text-muted); font-size:0.8rem;">المتاح: ${p.qty}</small></div>
+                    <div>
+                        <strong style="font-size:0.95rem;">${p.name}</strong><br>
+                        <span style="color:var(--accent); font-weight:bold; font-size:0.9rem;">السعر: ${p.price} ج.م</span>
+                    </div>
                 </div>
                 <div class="form-group"><label>اختر المقاس:</label><select id="order-size" class="form-control">${sizeOptions}</select></div>
                 <div class="form-group"><label>اختر اللون:</label><select id="order-color" class="form-control">${colorOptions}</select></div>
-                <div class="form-group"><label>الكمية المطلوبة:</label><input type="number" id="order-qty" class="form-control" value="1" min="1" max="${p.qty}"></div>
+                <div class="form-group">
+                    <label>الكمية المطلوبة:</label>
+                    <input type="number" id="order-qty" class="form-control" value="1" min="1" max="${p.qty}" oninput="updateOrderTotal(${p.price}, this.value)">
+                </div>
+                
+                <div id="order-total-display" style="text-align:center; font-size:1.1rem; font-weight:bold; color:var(--bg-dark-blue); margin-top:15px;">
+                    الإجمالي: ${p.price} ج.م
+                </div>
+
                 <hr style="border:0; border-top:1px solid var(--border-light); margin: 15px 0;">
                 <button class="btn btn-cart" onclick="addFromFormToCart(${p.id})"><i class="fa-solid fa-cart-plus"></i> إضافة للسلة (لطلب المزيد)</button>
                 <button class="btn btn-whatsapp" onclick="confirmDirectOrder(${p.id})"><i class="fa-brands fa-whatsapp"></i> تأكيد الطلب وإرسال واتساب</button>
             `;
             window.navigate('order-form');
+        }
+
+        window.updateOrderTotal = function(price, qty) {
+            let total = price * (parseInt(qty) || 1);
+            document.getElementById('order-total-display').innerText = `الإجمالي: ${total} ج.م`;
         }
 
         window.addFromFormToCart = function(id) {
@@ -485,23 +508,42 @@
             const p = window.products.find(x => x.id === id);
             let size = document.getElementById('order-size').value, color = document.getElementById('order-color').value, qty = parseInt(document.getElementById('order-qty').value);
             if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
+            
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const productUrl = `${baseUrl}?p=${p.shortCode}`;
-            let msg = `مرحباً A&M Store، أود طلب:\n\n🔖 كود المنتج: ${p.shortCode}\n المنتج: ${p.name}\n القسم: ${p.category}\n اللون: ${color}\n المقاس: ${size}\n العدد: ${qty}\n\n🔗 الرابط: ${productUrl}`;
+            const totalPrice = p.price * qty;
+
+            let msg = `مرحباً A&M Store، أود طلب:\n\n🔖 كود المنتج: ${p.shortCode}\n المنتج: ${p.name}\n القسم: ${p.category}\n اللون: ${color}\n المقاس: ${size}\n العدد: ${qty}\n إجمالي الحساب: ${totalPrice} ج.م\n\n🔗 الرابط: ${productUrl}`;
             window.open(`https://wa.me/${window.SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         window.renderCart = function() {
             const c = document.getElementById('cart-items');
-            c.innerHTML = window.cart.length ? window.cart.map((item, i) => `
+            const totalContainer = document.getElementById('cart-total-container');
+            
+            if(window.cart.length === 0) {
+                c.innerHTML = '<p style="text-align:center; font-size:0.85rem; color:var(--text-muted)">السلة فارغة.</p>';
+                totalContainer.innerHTML = '';
+                return;
+            }
+
+            let totalCartPrice = 0;
+            c.innerHTML = window.cart.map((item, i) => {
+                let itemTotal = item.price * item.selQty;
+                totalCartPrice += itemTotal;
+                return `
                 <div class="info-bar" style="margin-bottom:12px; padding: 10px;">
                     <img src="${item.images ? item.images[0] : item.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;">
                     <div style="flex:1; margin: 0 12px;">
                         <strong style="font-size:0.9rem;">${item.name}</strong><br>
-                        <small style="color:var(--text-muted); font-size:0.75rem;">لون: ${item.selColor} | مقاس: ${item.selSize} | <strong style="color:var(--bg-dark-blue)">العدد: ${item.selQty}</strong></small>
+                        <small style="color:var(--text-muted); font-size:0.75rem;">لون: ${item.selColor} | مقاس: ${item.selSize} | <strong style="color:var(--bg-dark-blue)">العدد: ${item.selQty}</strong></small><br>
+                        <span style="color:var(--accent); font-weight:bold; font-size:0.85rem;">${itemTotal} ج.م</span>
                     </div>
                     <i class="fa-solid fa-trash" style="color:#e74c3c; cursor:pointer; font-size:1.1rem; padding:8px;" onclick="removeFromCart(${i})"></i>
-                </div>`).join('') : '<p style="text-align:center; font-size:0.85rem; color:var(--text-muted)">السلة فارغة.</p>';
+                </div>`;
+            }).join('');
+
+            totalContainer.innerHTML = `<div class="cart-total-box">إجمالي حساب السلة: ${totalCartPrice} ج.م</div>`;
         }
 
         window.removeFromCart = function(i) { 
@@ -515,14 +557,20 @@
         window.checkoutCart = function() {
             if(!window.cart.length) return;
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            let totalCartPrice = 0;
+
             let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n` + window.cart.map((item, i) => {
                 const productUrl = `${baseUrl}?p=${item.shortCode}`;
-                return `${i+1}- ${item.name} (قسم: ${item.category})\n كود: ${item.shortCode}\n لون: ${item.selColor} /  مقاس: ${item.selSize} /  عدد: ${item.selQty}\n🔗 الرابط: ${productUrl}`;
+                let itemTotal = item.price * item.selQty;
+                totalCartPrice += itemTotal;
+                return `${i+1}- ${item.name} (قسم: ${item.category})\n🔖 كود: ${item.shortCode}\n لون: ${item.selColor} /  مقاس: ${item.selSize} / عدد: ${item.selQty}\n السعر: ${itemTotal} ج.م\n🔗 الرابط: ${productUrl}`;
             }).join('\n\n-----------------\n\n');
+            
+            msg += `\n\n🛒 إجمالي الحساب الكلي: ${totalCartPrice} ج.م`;
+
             window.open(`https://wa.me/${window.SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // تشغيل جلب البيانات عند البداية
         window.updateCartBadge();
         fetchProducts();
     </script>
