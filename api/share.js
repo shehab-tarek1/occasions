@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
     const p = req.query.p;
 
     // 1. قراءة ملف المتجر (تأكد أن اسم ملفك الرئيسي هو store.html)
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         return res.status(200).send(storeHtml);
     }
 
-    // 3. جلب بيانات المنتج من Firebase (بدون Timeout يقطع الاتصال)
+    // 3. جلب بيانات المنتج من Firebase
     const projectId = 'marketing-e9fdf';
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
 
@@ -74,14 +74,13 @@ export default async function handler(req, res) {
             imageUrl = fields.img.stringValue;
         }
 
-        // إجبار الصورة لتكون JPG ومربعة 600x600 ليقبلها الواتساب
+        // 🔴 إجبار الصورة لتكون JPG ومربعة 600x600 ليقبلها الواتساب
         if (imageUrl.includes('cloudinary.com')) {
-            const parts = imageUrl.split('/upload/');
-            if (parts.length === 2) {
-                let cleanUrl = parts[1];
-                cleanUrl = cleanUrl.replace(/^[a-z_0-9,:]+\//i, ''); // تنظيف الرابط
-                imageUrl = `${parts[0]}/upload/c_fill,g_auto,w_600,h_600,q_80,f_jpg/${cleanUrl}`;
-            }
+            const urlParts = imageUrl.split('/');
+            const fileId = urlParts.pop(); // اسم الملف
+            const version = urlParts.pop(); // رقم الإصدار v12345
+            // بناء رابط جديد ونظيف تماماً
+            imageUrl = `https://res.cloudinary.com/dsxrjmcxs/image/upload/w_600,h_600,c_fill,q_80,f_jpg/${version}/${fileId}`;
         }
 
         // 4. إرسال كود HTML مخصص للواتساب
@@ -91,6 +90,7 @@ export default async function handler(req, res) {
             <head>
                 <meta charset="UTF-8">
                 <title>${titleWithPrice}</title>
+                <meta name="robots" content="index, follow" />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="${titleWithPrice}" />
                 <meta property="og:description" content="${finalDesc}" />
@@ -121,4 +121,4 @@ export default async function handler(req, res) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         return res.status(200).send(storeHtml);
     }
-}
+};
