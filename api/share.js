@@ -35,7 +35,6 @@ export default async function handler(req, res) {
             const title = doc.name?.stringValue || 'A&M Store';
             const desc = doc.description?.stringValue || 'تسوق أحدث الملابس بأفضل الأسعار.';
             
-            // جلب السعر
             const price = doc.price?.integerValue || doc.price?.doubleValue || '';
             const finalDesc = price ? `السعر: ${price} ج.م | ${desc}` : desc;
             
@@ -46,10 +45,23 @@ export default async function handler(req, res) {
                 imageUrl = doc.img.stringValue;
             }
 
+            // 🔴 السر هنا: إجبار Cloudinary على إرجاع الصورة بصيغة JPG للواتساب بدلاً من WebP
+            imageUrl = imageUrl.replace('f_auto', 'f_jpg').replace('q_auto', 'q_80');
+
+            // استبدال البيانات
             html = html.replace('<title>A&M Store</title>', `<title>${title} | A&M Store</title>`);
             html = html.replace('content="A&M Store | متجر الأزياء الأول"', `content="${title}"`);
             html = html.replace('content="تشكيلة رائعة من أحدث الموديلات، اطلب الآن بأفضل الأسعار."', `content="${finalDesc}"`);
             html = html.replace('content="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg"', `content="${imageUrl}"`);
+            
+            // 🔴 إضافة الأكواد الإجبارية التي يطلبها الواتساب لظهور الصورة
+            const whatsappMetaTags = `
+                <meta property="og:image:secure_url" content="${imageUrl}">
+                <meta property="og:image:type" content="image/jpeg">
+                <meta property="og:image:width" content="800">
+                <meta property="og:image:height" content="800">
+            `;
+            html = html.replace('</head>', `${whatsappMetaTags}</head>`);
         }
     } catch (error) {
         console.error('Error fetching product:', error);
