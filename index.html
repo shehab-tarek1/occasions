@@ -58,10 +58,7 @@
         .inner-product-card h3 { padding: 10px 8px 4px; font-size: 0.85rem; color: var(--text-dark); margin: 0; }
         .inner-product-card p { padding: 0 8px 10px; font-size: 0.7rem; color: var(--text-muted); margin: 0; }
         
-        /* شارة الخصم */
         .badge-discount { position: absolute; top: 8px; left: 8px; background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        
-        /* شارة انتهت الكمية */
         .badge-outofstock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.75); color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; z-index: 5; white-space: nowrap; }
         .img-outofstock { opacity: 0.4; filter: grayscale(50%); }
 
@@ -140,7 +137,6 @@
                 <img src="https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400">
                 <h3>قسم أطفال</h3>
             </div>
-            <!-- صورة قسم العروض مجمعة ملابس -->
             <div class="category-card" onclick="openCategory('عروض')">
                 <img src="https://images.pexels.com/photos/994517/pexels-photo-994517.jpeg?auto=compress&cs=tinysrgb&w=400">
                 <h3>عروض خاصة</h3>
@@ -200,8 +196,8 @@
         <img src="https://res.cloudinary.com/dsxrjmcxs/image/upload/c_fill,g_auto,w_512,h_512/v1776992294/lsxv7x8xmgbrq0ht4yy7.jpg" class="footer-logo" alt="Logo">
         <h2 style="color: var(--text-light); font-size:1.1rem;">A&M Store</h2>
         <div style="margin-top: 5px; color: #cbd5e1; font-size: 0.85rem;">
-            <p>📍 العنوان: مصر</p>
-            <p>👤 البائع: A&M Manager</p>
+            <p><i class="fa-solid fa-location-dot" style="color: var(--accent); margin-left: 5px;"></i> العنوان: مصر</p>
+            <p style="margin-top: 5px;"><i class="fa-solid fa-user-tie" style="color: var(--accent); margin-left: 5px;"></i> البائع: A&M Manager</p>
         </div>
         <div class="social-links">
             <a href="https://www.instagram.com/_a_m_2026?igsh=bW1xdGJwdDJ4MXVt&utm_source=qr" target="_blank"><i class="fa-brands fa-instagram"></i></a>
@@ -212,7 +208,7 @@
     </footer>
 
     <script>
-        // تنظيف الرابط من index.html ليكون احترافي
+        // تنظيف الرابط
         if (window.location.href.includes('index.html')) {
             let cleanUrl = window.location.href.replace('index.html', '');
             window.history.replaceState({}, document.title, cleanUrl);
@@ -222,12 +218,12 @@
             return String(Math.floor(Math.random() * 1000) + 1).padStart(4, '0');
         }
 
-        // تحديث البيانات لدعم العروض وانتهت الكمية
+        // تحديث البيانات لدعم وصف التفاصيل (Description)
         const dummyData =[
-            { id: 1, shortCode: generateShortCode(), name: "بدلة كلاسيك إيطالي", category: "رجالي", qty: 10, isOffer: false, sizes:["M","L","XL","XXL"], colors:["أسود","كحلي داكن","رصاصي"], delivery: "القاهرة والإسكندرية", images:["https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
-            { id: 2, shortCode: generateShortCode(), name: "فستان سهرة لامع", category: "حريمي", qty: 0, isOffer: false, sizes:["S","M","L"], colors:["فضي لامع","أسود ملكي"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false }, // الكمية صفر للتجربة
-            { id: 3, shortCode: generateShortCode(), name: "طقم أطفال صيفي", category: "أطفال", qty: 15, isOffer: true, discount: "20%", sizes:["سنتين","4 سنوات"], colors:["أبيض","أزرق سماوي"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false }, // أضفنا له عرض
-            { id: 4, shortCode: generateShortCode(), name: "تيشيرت شبابي تريندي", category: "رجالي", qty: 30, isOffer: true, discount: "30%", sizes:["M","L","XL"], colors:["أسود","أبيض"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/5625009/pexels-photo-5625009.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false }
+            { id: 1, shortCode: generateShortCode(), name: "بدلة كلاسيك إيطالي", description: "بدلة إيطالية فاخرة مصنوعة من أجود أنواع القماش، تناسب المناسبات الرسمية وحفلات الزفاف، تمنحك إطلالة جذابة ومريحة.", category: "رجالي", qty: 10, isOffer: false, sizes:["M","L","XL","XXL"], colors:["أسود","كحلي داكن","رصاصي"], delivery: "القاهرة والإسكندرية", images:["https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
+            { id: 2, shortCode: generateShortCode(), name: "فستان سهرة لامع", description: "فستان سهرة بتصميم عصري وأنيق، مرصع بتفاصيل لامعة تجعلكِ تتألقين في أي مناسبة.", category: "حريمي", qty: 0, isOffer: false, sizes:["S","M","L"], colors:["فضي لامع","أسود ملكي"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
+            { id: 3, shortCode: generateShortCode(), name: "طقم أطفال صيفي", description: "طقم قطني مريح جداً لبشرة طفلك، تصميم عملي يتحمل اللعب المتكرر ومناسب لفصل الصيف.", category: "أطفال", qty: 15, isOffer: true, discount: "20%", sizes:["سنتين","4 سنوات"], colors:["أبيض","أزرق سماوي"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false },
+            { id: 4, shortCode: generateShortCode(), name: "تيشيرت شبابي تريندي", description: "تيشيرت كاجوال بخامة ممتازة لا تنكمش مع الغسيل، متوفر بألوان أساسية تليق على كل البناطيل.", category: "رجالي", qty: 30, isOffer: true, discount: "30%", sizes:["M","L","XL"], colors:["أسود","أبيض"], delivery: "جميع المحافظات", images:["https://images.pexels.com/photos/5625009/pexels-photo-5625009.jpeg?auto=compress&cs=tinysrgb&w=400"], hidden: false }
         ];
 
         if(!localStorage.getItem('am_products') || JSON.parse(localStorage.getItem('am_products')).length === 0) {
@@ -238,27 +234,34 @@
         products = products.map(p => {
             if(!p.images) p.images =[p.img]; 
             if(!p.shortCode) p.shortCode = generateShortCode();
+            if(!p.description) p.description = "خامة عالية الجودة ومريحة جداً، تصميم عصري يناسب مختلف الأوقات والمناسبات."; // وصف افتراضي للمنتجات القديمة
             return p;
         });
 
         let cart = JSON.parse(localStorage.getItem('am_cart')) ||[];
         const SELLER_PHONE = "201141226046";
+        
         let historyStack =['home'];
 
         function resetAndNavigate(pageId) {
-            historyStack =[pageId];
-            navigate(pageId, false);
+            historyStack = [pageId];
+            window.history.replaceState({ page: pageId }, "");
+            navigateUI(pageId);
         }
 
         function navigate(pageId, pushToHistory = true) {
+            if(pushToHistory && historyStack[historyStack.length - 1] !== pageId) {
+                historyStack.push(pageId);
+                window.history.pushState({ page: pageId }, "");
+            }
+            navigateUI(pageId);
+        }
+
+        function navigateUI(pageId) {
             const pages =['home', 'category', 'details', 'order-form', 'cart'];
             pages.forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            if(pushToHistory && historyStack[historyStack.length - 1] !== pageId) {
-                historyStack.push(pageId);
-            }
 
             const footer = document.getElementById('main-footer');
             if(pageId === 'home' || pageId === 'cart') {
@@ -271,13 +274,21 @@
             if(pageId === 'cart') renderCart();
         }
 
-        function goBack() {
-            if(historyStack.length > 1) {
+        window.addEventListener('popstate', (e) => {
+            if (historyStack.length > 1) {
                 historyStack.pop(); 
                 let previousPage = historyStack[historyStack.length - 1]; 
-                navigate(previousPage, false);
+                navigateUI(previousPage);
             } else {
-                navigate('home', false);
+                navigateUI('home');
+            }
+        });
+
+        function goBack() {
+            if (historyStack.length > 1) {
+                window.history.back();
+            } else {
+                resetAndNavigate('home');
             }
         }
 
@@ -288,9 +299,8 @@
 
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const shareUrl = `${baseUrl}?p=${p.shortCode}`;
-
             const shareTitle = `A&M Store | ${p.name}`;
-            const shareText = `✨ شاهد هذا المنتج الرائع من A&M Store!\n🛍️ ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n🛒 اضغط على الرابط التالي لمشاهدة التفاصيل:\n`;
+            const shareText = `✨ شاهد هذا المنتج الرائع من A&M Store!\n🛍️ ${p.name}\n🔖 كود المنتج: ${p.shortCode}\n🛒 للطلب، اضغط على الرابط التالي لمشاهدة التفاصيل:\n`;
 
             if (navigator.share) {
                 navigator.share({
@@ -307,7 +317,6 @@
 
         function updateCartBadge() { document.getElementById('cart-count-badge').innerText = cart.length; }
 
-        // دالة مساعدة لإنشاء HTML البطاقة
         function generateProductCardHTML(p) {
             let displayImg = p.images ? p.images[0] : p.img;
             let discountBadge = (p.isOffer && p.discount) ? `<div class="badge-discount">خصم ${p.discount}</div>` : '';
@@ -354,12 +363,9 @@
             const container = document.getElementById('category-products');
             container.innerHTML = '';
             
-            let filtered;
-            if (catName === 'عروض') {
-                filtered = products.filter(p => p.isOffer === true && !p.hidden);
-            } else {
-                filtered = products.filter(p => p.category === catName && !p.hidden);
-            }
+            let filtered = catName === 'عروض' 
+                ? products.filter(p => p.isOffer === true && !p.hidden)
+                : products.filter(p => p.category === catName && !p.hidden);
             
             if(filtered.length === 0) {
                 container.innerHTML = '<p style="grid-column: span 2; text-align:center; font-size:0.9rem; color:var(--text-muted)">لا توجد منتجات في هذا القسم حالياً.</p>';
@@ -388,7 +394,7 @@
             document.getElementById('lightbox').style.display = 'none';
         }
 
-        function openProduct(id) {
+        function openProduct(id, pushToHistory = true) {
             const p = products.find(x => x.id === id);
             
             let sizesHtml = p.sizes.map(s => `<span class="badge">${s}</span>`).join('');
@@ -398,7 +404,6 @@
             let sliderHtml = imgsArray.map(imgSrc => `<img src="${imgSrc}" onclick="openLightbox(this.src)">`).join('');
             let dotsHtml = imgsArray.map((_, i) => `<span class="dot ${i===0 ? 'active' : ''}"></span>`).join('');
 
-            // زر الطلب أو انتهت الكمية
             let orderBtnHTML = p.qty > 0 
                 ? `<button class="btn btn-primary" onclick="prepareOrder(${p.id})"><i class="fa-solid fa-bolt"></i> اطلب الآن</button>`
                 : `<button class="btn" style="background:#bdc3c7; color:#fff; cursor:not-allowed;"><i class="fa-solid fa-ban"></i> انتهت الكمية</button>`;
@@ -415,6 +420,27 @@
                     <strong style="font-size:0.95rem;">${p.name}</strong> 
                     <span style="color:${p.qty > 0 ? 'var(--bg-dark-blue)' : '#e74c3c'}; font-weight:bold; font-size:0.85rem;">متاح: ${p.qty}</span>
                 </div>
+
+                <!-- صندوق تفاصيل المنتج الجديد -->
+                <div class="options-section">
+                    <div style="font-weight:bold; font-size:0.9rem; color:var(--text-dark); margin-bottom: 8px;">
+                        <i class="fa-solid fa-file-lines" style="color:var(--accent);"></i> تفاصيل المنتج:
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); line-height: 1.6; margin: 0;">
+                        ${p.description}
+                    </p>
+                </div>
+
+                <!-- صندوق معلومات المنتج (الكود والتوصيل) -->
+                <div class="options-section" style="font-size:0.85rem; color:var(--text-dark)">
+                    <div style="margin-bottom: 10px;">
+                        <i class="fa-solid fa-hashtag" style="color:var(--accent); width: 15px;"></i> <strong>كود المنتج:</strong> <span style="color:var(--bg-dark-blue); font-weight:bold;">${p.shortCode}</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-location-dot" style="color:var(--accent); width: 15px;"></i> <strong>التوصيل:</strong> ${p.delivery}
+                    </div>
+                </div>
+
                 <div class="options-section">
                     <div style="font-weight:bold; font-size:0.9rem; color:var(--text-dark)">المقاسات المتوفرة:</div>
                     <div class="option-badges">${sizesHtml}</div>
@@ -423,13 +449,10 @@
                     <div style="font-weight:bold; font-size:0.9rem; color:var(--text-dark)">الألوان المتوفرة:</div>
                     <div class="option-badges">${colorsHtml}</div>
                 </div>
-                <div class="options-section" style="font-size:0.85rem; color:var(--text-dark)">
-                    📍 <strong>التوصيل:</strong> ${p.delivery}
-                </div>
                 
                 ${orderBtnHTML}
             `;
-            navigate('details');
+            navigate('details', pushToHistory);
         }
 
         function prepareOrder(id) {
@@ -470,7 +493,19 @@
             const p = products.find(x => x.id === id);
             let size = document.getElementById('order-size').value, color = document.getElementById('order-color').value, qty = parseInt(document.getElementById('order-qty').value);
             if (isNaN(qty) || qty < 1 || qty > p.qty) { alert("كمية غير متاحة!"); return; }
-            let msg = `مرحباً A&M Store، أود طلب:\n\nكود المنتج: ${p.shortCode}\nالمنتج: ${p.name}\nاللون: ${color}\nالمقاس: ${size}\nالعدد: ${qty}\n\nشكراً لكم.`;
+            
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            const productUrl = `${baseUrl}?p=${p.shortCode}`;
+            
+            let msg = `مرحباً A&M Store، أود طلب:\n\n`;
+            msg += `🔖 كود المنتج: ${p.shortCode}\n`;
+            msg += `🛍️ المنتج: ${p.name}\n`;
+            msg += `📁 القسم: ${p.category}\n`;
+            msg += `🎨 اللون: ${color}\n`;
+            msg += `📏 المقاس: ${size}\n`;
+            msg += `🔢 العدد: ${qty}\n\n`;
+            msg += `🔗 رابط المنتج: ${productUrl}`;
+
             window.open(`https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -491,7 +526,14 @@
         
         function checkoutCart() {
             if(!cart.length) return;
-            let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n` + cart.map((item, i) => `${i+1}- ${item.name} (كود: ${item.shortCode})\n   (لون: ${item.selColor} / مقاس: ${item.selSize} / عدد: ${item.selQty})`).join('\n\n');
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            let msg = `مرحباً A&M Store، هذا طلبي من السلة:\n\n`;
+            
+            msg += cart.map((item, i) => {
+                const productUrl = `${baseUrl}?p=${item.shortCode}`;
+                return `${i+1}- ${item.name} (قسم: ${item.category})\n🔖 كود: ${item.shortCode}\n🎨 لون: ${item.selColor} / 📏 مقاس: ${item.selSize} / 🔢 عدد: ${item.selQty}\n🔗 الرابط: ${productUrl}`;
+            }).join('\n\n-----------------\n\n');
+            
             window.open(`https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -500,11 +542,14 @@
             const urlParams = new URLSearchParams(window.location.search);
             const sharedCode = urlParams.get('p');
             
+            window.history.replaceState({ page: 'home' }, "");
+
             if (sharedCode) {
                 const targetProduct = products.find(x => x.shortCode === sharedCode);
                 if (targetProduct) {
-                    historyStack = ['home'];
-                    openProduct(targetProduct.id);
+                    historyStack = ['home', 'details'];
+                    window.history.pushState({ page: 'details' }, "");
+                    openProduct(targetProduct.id, false);
                     return;
                 }
             }
