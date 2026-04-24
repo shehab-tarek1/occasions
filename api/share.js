@@ -4,7 +4,7 @@ import path from 'path';
 export default async function handler(req, res) {
     const p = req.query.p;
 
-    // 1. قراءة ملف المتجر (store.html)
+    // 1. قراءة ملف المتجر (تأكد أن اسم ملفك الرئيسي هو store.html)
     const htmlPath = path.join(process.cwd(), 'store.html');
     let storeHtml = '';
     try {
@@ -13,6 +13,7 @@ export default async function handler(req, res) {
         storeHtml = '<!DOCTYPE html><html><body><script>window.location.replace("/");</script></body></html>';
     }
 
+    // إذا لم يكن هناك كود منتج، اعرض الموقع العادي
     if (!p) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         return res.status(200).send(storeHtml);
@@ -27,14 +28,11 @@ export default async function handler(req, res) {
         return res.status(200).send(storeHtml);
     }
 
-    // 3. جلب بيانات المنتج من Firebase
+    // 3. جلب بيانات المنتج من Firebase (بدون Timeout يقطع الاتصال)
     const projectId = 'marketing-e9fdf';
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
 
     try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 1500);
-
         const response = await fetch(firestoreUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -50,11 +48,8 @@ export default async function handler(req, res) {
                     },
                     limit: 1
                 }
-            }),
-            signal: controller.signal
+            })
         });
-
-        clearTimeout(timeout);
 
         if (!response.ok) throw new Error('Document not found');
         const data = await response.json();
@@ -79,21 +74,13 @@ export default async function handler(req, res) {
             imageUrl = fields.img.stringValue;
         }
 
-        // 🔴 الحل السحري: قص الصورة بذكاء لمقاس 400x400 وتقليل حجمها للواتساب
+        // إجبار الصورة لتكون JPG ومربعة 600x600 ليقبلها الواتساب
         if (imageUrl.includes('cloudinary.com')) {
             const parts = imageUrl.split('/upload/');
             if (parts.length === 2) {
                 let cleanUrl = parts[1];
-                
-                // إزالة أي إعدادات قص قديمة من الرابط (إن وجدت)
-                cleanUrl = cleanUrl.replace(/^[a-z_0-9,:]+\//i, '');
-                
-                // c_fill: قص لملء المربع
-                // g_auto: التركيز التلقائي على المنتج
-                // w_400,h_400: مقاس مثالي للواتساب
-                // q_70: ضغط الحجم
-                // f_jpg: إجبار صيغة JPG
-                imageUrl = `${parts[0]}/upload/c_fill,g_auto,w_400,h_400,q_70,f_jpg/${cleanUrl}`;
+                cleanUrl = cleanUrl.replace(/^[a-z_0-9,:]+\//i, ''); // تنظيف الرابط
+                imageUrl = `${parts[0]}/upload/c_fill,g_auto,w_600,h_600,q_80,f_jpg/${cleanUrl}`;
             }
         }
 
@@ -104,15 +91,14 @@ export default async function handler(req, res) {
             <head>
                 <meta charset="UTF-8">
                 <title>${titleWithPrice}</title>
-                <meta name="robots" content="index, follow" />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="${titleWithPrice}" />
                 <meta property="og:description" content="${finalDesc}" />
                 <meta property="og:image" content="${imageUrl}" />
                 <meta property="og:image:secure_url" content="${imageUrl}" />
                 <meta property="og:image:type" content="image/jpeg" />
-                <meta property="og:image:width" content="400" />
-                <meta property="og:image:height" content="400" />
+                <meta property="og:image:width" content="600" />
+                <meta property="og:image:height" content="600" />
                 <meta property="og:site_name" content="A&M Store" />
                 <meta property="og:url" content="https://${req.headers.host}/?p=${p}" />
                 <meta name="twitter:card" content="summary_large_image" />
@@ -131,6 +117,7 @@ export default async function handler(req, res) {
         return res.status(200).send(botHtml);
 
     } catch (error) {
+        console.error("Error:", error);
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         return res.status(200).send(storeHtml);
     }
