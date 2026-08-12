@@ -7,8 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- مكتبة ضغط الصور قبل الرفع -->
-    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
     
     <script>
         tailwind.config = {
@@ -21,15 +19,43 @@
         }
     </script>
     <style>
-        body { background-color: #050505; color: #fff; -webkit-tap-highlight-color: transparent; }
-        .glass-card { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: all 0.3s ease; }
+        body { 
+            background-color: #050505; 
+            color: #fff; 
+            -webkit-tap-highlight-color: transparent; 
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        .bg-fixed-container {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            height: 110lvh;
+            z-index: 0;
+            pointer-events: none;
+            transform: translateZ(0);
+        }
+
+        .glass-card { 
+            background: rgba(20, 20, 20, 0.75); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(212, 175, 55, 0.15); 
+            border-radius: 2rem; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            transition: all 0.3s ease; 
+        }
+
         .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; }
         .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
         .accordion-content { transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, padding 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; padding-top: 0; padding-bottom: 0; }
         .accordion-content.open { max-height: 1000px; opacity: 1; padding-top: 1.5rem; padding-bottom: 0.5rem; }
         ::-webkit-scrollbar { display: none; }
         
-        /* تصميم زر رفع الملفات */
         .file-upload-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: rgba(212,175,55,0.1); border: 1px dashed rgba(212,175,55,0.5); color: #D4AF37; border-radius: 1rem; cursor: pointer; transition: all 0.3s; width: 100%; font-weight: bold; }
         .file-upload-btn:hover { background: rgba(212,175,55,0.2); }
         input[type="file"] { display: none; }
@@ -37,7 +63,11 @@
 </head>
 <body class="antialiased min-h-screen relative selection:bg-gold selection:text-black pb-24">
 
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+    <!-- خلفية فاخرة مظلمة للموقع ولوحة الدخول -->
+    <div class="bg-fixed-container">
+        <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1200&auto=format&fit=crop" alt="Admin Background" class="w-full h-full object-cover opacity-35">
+        <div class="absolute inset-0 bg-black/70"></div>
+    </div>
 
     <!-- 1. شاشة التحميل -->
     <div id="loaderView" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505]">
@@ -45,13 +75,13 @@
         <p class="text-gold font-bold">جاري التحقق...</p>
     </div>
 
-    <!-- 2. شاشة تسجيل الدخول (مدمجة هنا) -->
+    <!-- 2. شاشة تسجيل الدخول المدمجة الفاخرة -->
     <div id="loginView" class="hidden relative z-10 min-h-screen flex items-center justify-center p-5">
         <div class="glass-card p-8 w-full max-w-sm text-center">
             <div class="w-16 h-16 mx-auto bg-gold/20 rounded-full flex items-center justify-center text-gold mb-4">
                 <i class="ph-fill ph-lock-key text-3xl"></i>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-6">تسجيل الدخول</h2>
+            <h2 class="text-2xl font-bold text-white mb-6 tracking-wide">تسجيل الدخول</h2>
             <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" class="luxury-input w-full p-4 mb-4 text-left" dir="ltr">
             <input type="password" id="loginPass" placeholder="كلمة المرور" class="luxury-input w-full p-4 mb-6 text-left" dir="ltr">
             <button onclick="performLogin()" id="loginBtn" class="w-full py-4 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold text-lg rounded-xl shadow-[0_10px_30px_rgba(212,175,55,0.4)] active:scale-95 transition-transform">
@@ -65,10 +95,9 @@
     <main id="superAdminView" class="hidden relative z-10 max-w-5xl mx-auto px-5 py-10">
         <div class="flex justify-between items-center mb-10">
             <h1 class="text-3xl font-bold text-white"><i class="ph-fill ph-crown text-gold mr-2"></i> الإدارة العليا</h1>
-            <button onclick="logout()" class="px-4 py-2 bg-red-500/10 text-red-400 rounded-xl font-bold"><i class="ph-bold ph-sign-out"></i> خروج</button>
+            <button onclick="logout()" class="px-4 py-2 bg-red-500/10 text-red-400 rounded-xl font-bold hover:bg-red-500/20"><i class="ph-bold ph-sign-out"></i> خروج</button>
         </div>
 
-        <!-- قسم توليد الكروت -->
         <div class="glass-card p-8 text-center mb-10">
             <h2 class="text-xl font-bold text-gold mb-4">توليد كارت NFC جديد</h2>
             <div class="max-w-sm mx-auto mb-6">
@@ -82,11 +111,8 @@
             </div>
         </div>
 
-        <!-- قسم قائمة العملاء -->
         <h2 class="text-xl font-bold text-white mb-4">المطاعم المسجلة</h2>
-        <div id="clientsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- سيتم حقن كروت العملاء هنا -->
-        </div>
+        <div id="clientsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </main>
 
     <!-- 4. لوحة صاحب المطعم -->
@@ -112,7 +138,6 @@
         </header>
 
         <form id="editForm" onsubmit="saveData(event)" class="space-y-6">
-            <!-- المعلومات الأساسية والصور -->
             <div class="glass-card p-2">
                 <button type="button" onclick="toggleAccordion('acc1')" class="w-full flex justify-between items-center p-4 text-white hover:text-gold transition-colors">
                     <div class="flex items-center gap-3"><div class="p-2 bg-white/5 rounded-lg text-gold"><i class="ph-fill ph-info text-xl"></i></div><span class="font-bold text-lg">المعلومات والصور</span></div>
@@ -124,7 +149,6 @@
                         <div><label class="block text-sm font-medium text-gray-400 mb-2">رقم هاتف الحجوزات</label><input type="text" id="inputPhone" dir="ltr" class="luxury-input w-full p-4 text-base text-left"></div>
                         <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-400 mb-2">رسالة الترحيب (الوصف)</label><textarea id="inputDesc" rows="2" class="luxury-input w-full p-4 text-base resize-none"></textarea></div>
                         
-                        <!-- رفع اللوجو -->
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-2">لوجو المطعم</label>
                             <label class="file-upload-btn">
@@ -135,7 +159,6 @@
                             <img id="logoPreview" src="" class="mt-2 h-16 rounded-xl hidden object-cover">
                         </div>
                         
-                        <!-- رفع الخلفية -->
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-2">خلفية الموقع</label>
                             <label class="file-upload-btn">
@@ -149,7 +172,6 @@
                 </div>
             </div>
 
-            <!-- المنيو (رفع متعدد) -->
             <div class="glass-card p-2">
                 <button type="button" onclick="toggleAccordion('acc2')" class="w-full flex justify-between items-center p-4 text-white hover:text-gold transition-colors">
                     <div class="flex items-center gap-3"><div class="p-2 bg-white/5 rounded-lg text-gold"><i class="ph-fill ph-book-open-text text-xl"></i></div><span class="font-bold text-lg">إدارة صور المنيو</span></div>
@@ -163,12 +185,10 @@
                         <input type="file" accept="image/*" multiple onchange="handleMenuUpload(this)">
                     </label>
                     
-                    <!-- معرض صور المنيو -->
                     <div id="menuGallery" class="grid grid-cols-3 gap-3 pb-4"></div>
                 </div>
             </div>
 
-            <!-- السوشيال ميديا -->
             <div class="glass-card p-2">
                 <button type="button" onclick="toggleAccordion('acc3')" class="w-full flex justify-between items-center p-4 text-white hover:text-gold transition-colors">
                     <div class="flex items-center gap-3"><div class="p-2 bg-white/5 rounded-lg text-gold"><i class="ph-fill ph-share-network text-xl"></i></div><span class="font-bold text-lg">الروابط ومنصات التواصل</span></div>
@@ -192,11 +212,11 @@
         </form>
     </main>
 
-    <!-- Firebase & Logic -->
+    <!-- Firebase & Ultra Fast Canvas Compression Upload -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBvIUJRs5tStQ8vqmsfEd7eOF0ptyjk8Ts",
@@ -213,9 +233,9 @@
         const db = getFirestore(app);
         const SUPER_ADMIN_UID = "Mxv1SpzNDfNpQNt9ndhZQ9ayETS2";
         let currentUserUid = null;
-        let uploadedMenuImages = []; // مصفوفة لحفظ روابط المنيو
+        let uploadedMenuImages = [];
 
-        // 1. نظام الدخول المدمج
+        // 1. نظام الدخول
         onAuthStateChanged(auth, async (user) => {
             document.getElementById('loaderView').classList.add('hidden');
             if (user) {
@@ -251,22 +271,37 @@
         }
         window.logout = function() { signOut(auth); }
 
-        // 2. رفع الصور لـ Cloudinary مع الضغط
+        // 2. ضغط محلي فائق السرعة عبر Canvas أصلي (< 0.3 ثانية)
+        function compressFastNative(file, maxWidth = 1200, quality = 0.75) {
+            return new Promise((resolve) => {
+                if (file.size < 250 * 1024) { resolve(file); return; } // أقل من 250KB يترفع مباشرة
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    URL.revokeObjectURL(img.src);
+                    let w = img.width, h = img.height;
+                    if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', quality);
+                };
+                img.onerror = () => resolve(file);
+            });
+        }
+
         async function uploadToCloudinary(file) {
-            // ضغط الصورة أولاً
-            const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
-            const compressedFile = await imageCompression(file, options);
-            
+            const compressed = await compressFastNative(file);
             const formData = new FormData();
-            formData.append('file', compressedFile);
-            formData.append('upload_preset', 'my_public_preset'); // الـ Preset الخاص بك
+            formData.append('file', compressed);
+            formData.append('upload_preset', 'my_public_preset');
 
             const res = await fetch('https://api.cloudinary.com/v1_1/dsxrjmcxs/image/upload', {
                 method: 'POST', body: formData
             });
             const data = await res.json();
             
-            // تحويل الرابط ليصبح بعرض 600px وصيغة خفيفة
             const urlParts = data.secure_url.split('/upload/');
             return `${urlParts[0]}/upload/w_600,q_auto,f_auto/${urlParts[1]}`;
         }
@@ -321,7 +356,7 @@
             renderMenuGallery();
         }
 
-        // 3. إدارة بيانات المطعم
+        // 3. بيانات المطعم
         async function loadRestaurantData(uid) {
             try {
                 const docSnap = await getDoc(doc(db, "restaurants", uid));
@@ -390,7 +425,7 @@
             }
         }
 
-        // 4. لوحة المدير العام (توليد الكروت وإدارة العملاء)
+        // 4. الإدارة العليا
         window.generateNewCard = async function() {
             let slugInput = document.getElementById('customSlug').value.trim().toLowerCase().replace(/[^a-z0-9]/g, ''); 
             if(!slugInput) return alert("أدخل اسم المطعم بالإنجليزي");
@@ -410,11 +445,11 @@
 
         async function loadClientsList() {
             const list = document.getElementById('clientsList');
-            list.innerHTML = '<p class="text-gray-400">جاري جلب البيانات...</p>';
+            list.innerHTML = '<p class="text-gray-400 col-span-full text-center">جاري جلب البيانات...</p>';
             try {
                 const querySnapshot = await getDocs(collection(db, "restaurants"));
                 list.innerHTML = '';
-                if(querySnapshot.empty) { list.innerHTML = '<p class="text-gray-400">لا يوجد مطاعم مسجلة بعد.</p>'; return; }
+                if(querySnapshot.empty) { list.innerHTML = '<p class="text-gray-400 col-span-full text-center">لا يوجد مطاعم مسجلة بعد.</p>'; return; }
                 
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
@@ -426,26 +461,24 @@
                             <p class="text-xs text-gray-400">${data.phone}</p>
                             <a href="index.html?card=${data.cardId}" target="_blank" class="text-xs text-blue-400 hover:underline mt-1 inline-block">عرض الكارت</a>
                         </div>
-                        <button onclick="deleteClient('${docSnap.id}', '${data.cardId}')" class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-colors">
-                            <i class="ph-bold ph-trash"></i>
+                        <button onclick="deleteClient('${docSnap.id}', '${data.cardId}')" class="p-2.5 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-colors">
+                            <i class="ph-bold ph-trash text-lg"></i>
                         </button>
                     `;
                     list.appendChild(div);
                 });
-            } catch(e) { list.innerHTML = '<p class="text-red-400">فشل جلب البيانات</p>'; }
+            } catch(e) { list.innerHTML = '<p class="text-red-400 col-span-full text-center">فشل جلب البيانات</p>'; }
         }
 
         window.deleteClient = async function(uid, cardId) {
             if(!confirm("هل أنت متأكد من حذف هذا المطعم؟ سيتم إفراغ الكارت الخاص به.")) return;
             try {
-                // حذف بيانات المطعم
                 await deleteDoc(doc(db, "restaurants", uid));
-                // إعادة الكارت لحالة pending
                 if(cardId) {
                     await updateDoc(doc(db, "cards", cardId), { status: 'pending', ownerId: null });
                 }
                 alert("تم الحذف بنجاح");
-                loadClientsList(); // تحديث القائمة
+                loadClientsList();
             } catch(e) { alert("حدث خطأ أثناء الحذف"); }
         }
 
