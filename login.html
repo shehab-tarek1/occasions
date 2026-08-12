@@ -2,21 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل الدخول</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - VIP</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #050505; color: white; }
+        .glass-panel { background: rgba(20, 20, 20, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+        .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; transition: all 0.3s; }
+        .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; }
+    </style>
 </head>
-<body class="bg-[#050505] text-white min-h-screen flex items-center justify-center">
+<body class="min-h-screen flex items-center justify-center p-5 relative">
     
-    <div class="bg-gray-900 p-8 rounded-2xl w-full max-w-sm border border-gray-800 shadow-2xl">
-        <h2 class="text-2xl font-bold text-gold mb-6 text-center">تسجيل الدخول</h2>
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#D4AF37]/10 blur-[100px] rounded-full pointer-events-none z-0"></div>
+
+    <div class="glass-panel rounded-[2rem] p-8 w-full max-w-sm relative z-10 text-center">
+        <div class="w-16 h-16 mx-auto bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37] mb-4">
+            <i class="ph-fill ph-lock-key text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-6">تسجيل الدخول</h2>
         
-        <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full p-3 mb-4 bg-black border border-gray-700 rounded text-white text-left" dir="ltr">
-        <input type="password" id="pass" placeholder="كلمة المرور" class="w-full p-3 mb-6 bg-black border border-gray-700 rounded text-white text-left" dir="ltr">
+        <input type="email" id="email" placeholder="البريد الإلكتروني" class="luxury-input w-full p-4 rounded-xl mb-4 text-left" dir="ltr">
+        <input type="password" id="pass" placeholder="كلمة المرور" class="luxury-input w-full p-4 rounded-xl mb-6 text-left" dir="ltr">
         
-        <button onclick="login()" id="loginBtn" class="w-full p-3 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold rounded-xl">
+        <button onclick="login()" id="loginBtn" class="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-yellow-600 text-black font-bold text-lg rounded-xl shadow-[0_10px_30px_rgba(212,175,55,0.4)] active:scale-95 transition-transform">
             دخول
         </button>
-        <p id="errorMsg" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+        <p id="errorMsg" class="text-red-400 text-sm mt-4 hidden"></p>
     </div>
 
     <script type="module">
@@ -39,13 +53,12 @@
             const errorMsg = document.getElementById('errorMsg');
             
             if(!email || !pass) return;
-
             btn.innerText = "جاري الدخول...";
             errorMsg.classList.add('hidden');
 
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
-                window.location.href = "admin.html"; // توجيه للوحة التحكم بعد النجاح
+                window.location.href = "admin.html";
             } catch(e) {
                 btn.innerText = "دخول";
                 errorMsg.innerText = "بيانات الدخول غير صحيحة!";
