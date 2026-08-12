@@ -3,43 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم</title>
+    <title>VIP Dashboard - NFC Restaurant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    colors: { gold: '#D4AF37', 'gold-light': '#F3E5AB' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #fff; -webkit-tap-highlight-color: transparent; }
+        .glass-card { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: all 0.3s ease; }
+        .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; }
+        .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
+        .accordion-content { transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, padding 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; padding-top: 0; padding-bottom: 0; }
+        .accordion-content.open { max-height: 1000px; opacity: 1; padding-top: 1.5rem; padding-bottom: 0.5rem; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
 </head>
-<body class="bg-[#050505] text-white min-h-screen">
+<body class="antialiased min-h-screen relative selection:bg-gold selection:text-black pb-24">
 
-    <!-- 1. شاشة التحميل (تظهر أولاً) -->
-    <div id="loader" class="fixed inset-0 bg-[#050505] z-50 flex flex-col items-center justify-center">
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <!-- 1. شاشة التحميل -->
+    <div id="loaderView" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505]">
         <div class="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-gold text-xl font-bold">جاري التحقق من الصلاحيات...</p>
+        <p class="text-gold font-bold">جاري التحقق من الصلاحيات...</p>
     </div>
 
     <!-- 2. لوحة المدير العام (Super Admin) -->
-    <div id="superAdminPanel" class="hidden p-10">
-        <h1 class="text-3xl font-bold text-gold mb-6">لوحة الإدارة العليا</h1>
-        <button onclick="generateNewCard()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold mb-6">
-            + توليد كارت NFC جديد
-        </button>
-        <div id="newCardLink" class="hidden p-4 bg-gray-900 border border-green-500 rounded-xl mb-6">
-            <p class="text-sm text-gray-400 mb-2">انسخ هذا الرابط وقم ببرمجته داخل شريحة الـ NFC:</p>
-            <input type="text" id="generatedLink" class="w-full p-2 bg-black text-green-400 rounded" readonly>
+    <main id="superAdminView" class="hidden relative z-10 max-w-4xl mx-auto px-5 py-20 text-center">
+        <div class="glass-card p-10">
+            <i class="ph-fill ph-crown text-6xl text-gold mb-4"></i>
+            <h1 class="text-3xl font-bold text-white mb-8">لوحة الإدارة العليا</h1>
+            <button onclick="generateNewCard()" class="bg-gradient-to-r from-gold to-yellow-600 text-black px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-[0_10px_30px_rgba(212,175,55,0.4)]">
+                + توليد كارت NFC جديد
+            </button>
+            <div id="newCardLink" class="hidden mt-8 p-6 bg-black/50 border border-gold/30 rounded-2xl">
+                <p class="text-sm text-gray-400 mb-3">انسخ هذا الرابط وقم ببرمجته داخل شريحة الـ NFC:</p>
+                <input type="text" id="generatedLink" class="luxury-input w-full p-4 text-gold text-center font-bold" readonly onclick="this.select()">
+            </div>
         </div>
-    </div>
+    </main>
 
-    <!-- 3. لوحة صاحب المطعم (التصميم الفاخر الذي صنعناه) -->
-    <div id="restaurantPanel" class="hidden">
-        <!-- ضع هنا كود الـ HTML الخاص بلوحة تحكم المطعم الفاخرة (بدون الـ body والـ head) -->
-        <div class="p-10 text-center">
-            <h1 class="text-2xl text-gold">مرحباً بك في لوحة تحكم مطعمك</h1>
-            <!-- باقي تصميم المطعم هنا -->
+    <!-- 3. لوحة صاحب المطعم (التصميم الأصلي الخاص بك) -->
+    <main id="ownerView" class="hidden relative z-10 max-w-4xl mx-auto px-5 py-10">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-gold to-yellow-600 flex items-center justify-center text-black shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                    <i class="ph-bold ph-nfc text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-wide">لوحة تحكم <span id="adminRestName" class="text-gold"></span></h1>
+                    <p class="text-gray-400 text-sm mt-1">إدارة هويتك الرقمية بكل سهولة.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <a href="index.html" class="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-gold hover:bg-white/10 transition-colors flex items-center gap-2 text-sm font-bold">
+                    <i class="ph-bold ph-eye"></i> معاينة
+                </a>
+                <button onclick="logout()" class="px-5 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-2 text-sm font-bold">
+                    <i class="ph-bold ph-sign-out"></i> خروج
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="glass-card !rounded-2xl p-5 flex flex-col items-center justify-center text-center"><i class="ph-fill ph-users-three text-3xl text-gray-400 mb-2"></i><p id="statViews" class="text-2xl font-bold text-white">0</p><p class="text-xs text-gray-400 mt-1">الزيارات</p></div>
+            <div class="glass-card !rounded-2xl p-5 flex flex-col items-center justify-center text-center"><i class="ph-fill ph-book-open text-3xl text-gray-400 mb-2"></i><p id="statMenu" class="text-2xl font-bold text-white">0</p><p class="text-xs text-gray-400 mt-1">فتح المنيو</p></div>
+            <div class="glass-card !rounded-2xl p-5 flex flex-col items-center justify-center text-center"><i class="ph-fill ph-phone-call text-3xl text-gray-400 mb-2"></i><p id="statCalls" class="text-2xl font-bold text-white">0</p><p class="text-xs text-gray-400 mt-1">الاتصالات</p></div>
+            <div class="glass-card !rounded-2xl p-5 flex flex-col items-center justify-center text-center"><i class="ph-fill ph-star text-3xl text-gray-400 mb-2"></i><p id="statReviews" class="text-2xl font-bold text-white">0</p><p class="text-xs text-gray-400 mt-1">التقييمات</p></div>
         </div>
-    </div>
+
+        <form id="editForm" onsubmit="saveData(event)" class="space-y-6">
+            <div class="glass-card p-2">
+                <button type="button" onclick="toggleAccordion('acc1')" class="w-full flex justify-between items-center p-4 text-white hover:text-gold transition-colors">
+                    <div class="flex items-center gap-3"><div class="p-2 bg-white/5 rounded-lg text-gold"><i class="ph-fill ph-info text-xl"></i></div><span class="font-bold text-lg">المعلومات الأساسية</span></div>
+                    <i id="icon-acc1" class="ph-bold ph-caret-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="acc1" class="accordion-content px-4 border-t border-white/5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-4">
+                        <div><label class="block text-sm font-medium text-gray-400 mb-2">اسم المطعم</label><input type="text" id="inputName" class="luxury-input w-full p-4 text-base"></div>
+                        <div><label class="block text-sm font-medium text-gray-400 mb-2">رقم هاتف الحجوزات</label><input type="text" id="inputPhone" dir="ltr" class="luxury-input w-full p-4 text-base text-left"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-400 mb-2">رابط اللوجو (صورة)</label><input type="url" id="inputLogo" dir="ltr" class="luxury-input w-full p-4 text-base text-left"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-400 mb-2">رسالة الترحيب (الوصف)</label><textarea id="inputDesc" rows="2" class="luxury-input w-full p-4 text-base resize-none"></textarea></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-2">
+                <button type="button" onclick="toggleAccordion('acc2')" class="w-full flex justify-between items-center p-4 text-white hover:text-gold transition-colors">
+                    <div class="flex items-center gap-3"><div class="p-2 bg-white/5 rounded-lg text-gold"><i class="ph-fill ph-book-open-text text-xl"></i></div><span class="font-bold text-lg">إدارة صور المنيو</span></div>
+                    <i id="icon-acc2" class="ph-bold ph-caret-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="acc2" class="accordion-content px-4 border-t border-white/5">
+                    <p class="text-xs text-gray-400 mb-4">أضف روابط صور المنيو الخاصة بك. ستظهر للعميل كقائمة قابلة للتمرير.</p>
+                    <div id="menuInputsContainer" class="space-y-3 pb-4"></div>
+                    <button type="button" onclick="addMenuInput('')" class="mb-4 w-full py-3 border border-dashed border-gold/30 text-gold rounded-xl hover:bg-gold/10 transition-colors text-sm font-bold flex items-center justify-center gap-2"><i class="ph-bold ph-plus"></i> إضافة صفحة منيو جديدة</button>
+                </div>
+            </div>
+
+            <div class="glass-card p-2">
+                <button type="button" onclick="toggleAccordion('acc3')" class="w-full flex justify-between items-center p-4 text-white hover:text-gold transition-colors">
+                    <div class="flex items-center gap-3"><div class="p-2 bg-white/5 rounded-lg text-gold"><i class="ph-fill ph-share-network text-xl"></i></div><span class="font-bold text-lg">الروابط ومنصات التواصل</span></div>
+                    <i id="icon-acc3" class="ph-bold ph-caret-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="acc3" class="accordion-content px-4 border-t border-white/5">
+                    <div class="grid grid-cols-1 gap-5 pb-4">
+                        <div><label class="block text-sm font-medium text-gray-400 mb-2"><i class="ph-fill ph-star text-gold ml-1"></i> رابط تقييم جوجل</label><input type="url" id="inputReview" dir="ltr" class="luxury-input w-full p-3.5 text-left text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-400 mb-2"><i class="ph-fill ph-whatsapp-logo text-[#25D366] ml-1"></i> رابط واتساب</label><input type="url" id="inputWa" dir="ltr" class="luxury-input w-full p-3.5 text-left text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-400 mb-2"><i class="ph-fill ph-instagram-logo text-[#E1306C] ml-1"></i> رابط انستجرام</label><input type="url" id="inputIg" dir="ltr" class="luxury-input w-full p-3.5 text-left text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-400 mb-2"><i class="ph-fill ph-facebook-logo text-[#1877F2] ml-1"></i> رابط فيسبوك</label><input type="url" id="inputFb" dir="ltr" class="luxury-input w-full p-3.5 text-left text-sm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50">
+                <button type="submit" id="saveBtn" class="w-full py-4 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold text-lg rounded-2xl shadow-[0_10px_30px_rgba(212,175,55,0.4)] transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                    <span>حفظ التحديثات</span><i class="ph-bold ph-check hidden text-xl" id="saveIcon"></i>
+                </button>
+            </div>
+        </form>
+    </main>
 
     <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBvIUJRs5tStQ8vqmsfEd7eOF0ptyjk8Ts",
@@ -54,49 +152,132 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
         const SUPER_ADMIN_UID = "Mxv1SpzNDfNpQNt9ndhZQ9ayETS2";
+        let currentUserUid = null;
 
-        // التحقق من حالة تسجيل الدخول
-        onAuthStateChanged(auth, (user) => {
-            const loader = document.getElementById('loader');
-            
+        const dummyData = {
+            name: "لا بيرجولا", description: "وصف تجريبي", phone: "+971501234567", logo: "", reviewUrl: "",
+            menuImages: [""], socials: { whatsapp: "", instagram: "", facebook: "" },
+            stats: { views: 0, menu: 0, calls: 0, reviews: 0 }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loader.classList.add('hidden'); // إخفاء اللودينج
+                currentUserUid = user.uid;
+                document.getElementById('loaderView').classList.add('hidden');
                 
                 if (user.uid === SUPER_ADMIN_UID) {
-                    // إظهار لوحة المدير العام
-                    document.getElementById('superAdminPanel').classList.remove('hidden');
+                    document.getElementById('superAdminView').classList.remove('hidden');
                 } else {
-                    // إظهار لوحة المطعم
-                    document.getElementById('restaurantPanel').classList.remove('hidden');
-                    // هنا يمكنك استدعاء دالة لجلب بيانات المطعم من Firestore
+                    document.getElementById('ownerView').classList.remove('hidden');
+                    loadRestaurantData(user.uid);
                 }
             } else {
-                // إذا لم يكن مسجلاً للدخول، تحويله لصفحة تسجيل الدخول
                 window.location.href = "login.html";
             }
         });
 
-        // دالة توليد كارت جديد (للمدير العام فقط)
+        async function loadRestaurantData(uid) {
+            try {
+                const docSnap = await getDoc(doc(db, "restaurants", uid));
+                const data = docSnap.exists() ? docSnap.data() : dummyData;
+                
+                document.getElementById('adminRestName').textContent = data.name || dummyData.name;
+                document.getElementById('inputName').value = data.name || "";
+                document.getElementById('inputPhone').value = data.phone || "";
+                document.getElementById('inputDesc').value = data.description || "";
+                document.getElementById('inputLogo').value = data.logo || "";
+                document.getElementById('inputReview').value = data.reviewUrl || "";
+                
+                const socials = data.socials || {};
+                document.getElementById('inputWa').value = socials.whatsapp || "";
+                document.getElementById('inputIg').value = socials.instagram || "";
+                document.getElementById('inputFb').value = socials.facebook || "";
+
+                const stats = data.stats || dummyData.stats;
+                document.getElementById('statViews').textContent = stats.views || 0;
+                document.getElementById('statMenu').textContent = stats.menu || 0;
+                document.getElementById('statCalls').textContent = stats.calls || 0;
+                document.getElementById('statReviews').textContent = stats.reviews || 0;
+
+                const menuContainer = document.getElementById('menuInputsContainer');
+                menuContainer.innerHTML = '';
+                const images = (data.menuImages && data.menuImages.length > 0) ? data.menuImages : [''];
+                images.forEach(url => addMenuInput(url));
+
+                toggleAccordion('acc1');
+            } catch(e) { console.error(e); }
+        }
+
+        window.saveData = async function(e) {
+            e.preventDefault();
+            if(!currentUserUid) return;
+
+            const btn = document.getElementById('saveBtn');
+            const icon = document.getElementById('saveIcon');
+            const btnText = btn.querySelector('span');
+            btnText.textContent = "جاري الحفظ...";
+
+            const menuInputs = document.querySelectorAll('.menu-url-input');
+            const menuImages = Array.from(menuInputs).map(input => input.value).filter(val => val.trim() !== "");
+
+            const updatedData = {
+                name: document.getElementById('inputName').value,
+                phone: document.getElementById('inputPhone').value,
+                description: document.getElementById('inputDesc').value,
+                logo: document.getElementById('inputLogo').value,
+                reviewUrl: document.getElementById('inputReview').value,
+                menuImages: menuImages,
+                socials: {
+                    whatsapp: document.getElementById('inputWa').value,
+                    instagram: document.getElementById('inputIg').value,
+                    facebook: document.getElementById('inputFb').value
+                }
+            };
+
+            try {
+                await updateDoc(doc(db, "restaurants", currentUserUid), updatedData);
+                btnText.textContent = "تم الحفظ بنجاح";
+                btn.classList.replace('from-gold', 'from-emerald-400');
+                btn.classList.replace('to-yellow-600', 'to-emerald-600');
+                icon.classList.remove('hidden');
+                setTimeout(() => {
+                    btnText.textContent = "حفظ التحديثات";
+                    btn.classList.replace('from-emerald-400', 'from-gold');
+                    btn.classList.replace('to-emerald-600', 'to-yellow-600');
+                    icon.classList.add('hidden');
+                }, 2500);
+            } catch(err) {
+                alert("حدث خطأ أثناء الحفظ");
+                btnText.textContent = "حفظ التحديثات";
+            }
+        }
+
         window.generateNewCard = async function() {
             try {
-                const docRef = await addDoc(collection(db, "cards"), {
-                    status: "pending",
-                    createdAt: new Date()
-                });
-                
+                const docRef = await addDoc(collection(db, "cards"), { status: "pending", createdAt: new Date() });
                 const linkBox = document.getElementById('newCardLink');
                 const linkInput = document.getElementById('generatedLink');
-                
-                // إنشاء الرابط بناءً على الدومين الحالي
-                const currentDomain = window.location.origin;
-                linkInput.value = `${currentDomain}/index.html?card=${docRef.id}`;
-                
+                linkInput.value = `${window.location.origin}/index.html?card=${docRef.id}`;
                 linkBox.classList.remove('hidden');
-            } catch (e) {
-                alert("حدث خطأ أثناء توليد الكارت: " + e.message);
-            }
+            } catch (e) { alert("خطأ: " + e.message); }
+        }
+
+        window.logout = function() { signOut(auth).then(() => window.location.href = "login.html"); }
+        
+        window.toggleAccordion = function(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            content.classList.toggle('open');
+            icon.classList.toggle('rotate-180');
+            icon.classList.toggle('text-gold');
+        }
+        window.addMenuInput = function(value) {
+            const container = document.getElementById('menuInputsContainer');
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center";
+            div.innerHTML = `<div class="flex-1 relative"><input type="url" dir="ltr" value="${value}" class="menu-url-input luxury-input w-full p-3.5 text-left text-sm" placeholder="رابط صورة المنيو..."></div><button type="button" onclick="this.parentElement.remove()" class="p-3.5 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20"><i class="ph-bold ph-trash"></i></button>`;
+            container.appendChild(div);
         }
     </script>
 </body>
