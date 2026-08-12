@@ -23,8 +23,11 @@
         .glass-panel { background: rgba(20, 20, 20, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
         .glass-button { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
         .glass-button:active { transform: scale(0.97); background: rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.5); }
-        .menu-wrapper { transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        
+        /* تسريع حركة المنيو إلى 0.2s */
+        .menu-wrapper { transition: max-height 0.2s ease-in-out, opacity 0.2s ease-in-out, padding 0.2s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
         .menu-wrapper.open { max-height: 450px; opacity: 1; padding-top: 1rem; }
+        
         .menu-scroll-container { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 4px; }
         .menu-scroll-container::-webkit-scrollbar { width: 4px; }
         .menu-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
@@ -36,10 +39,9 @@
 </head>
 <body class="antialiased text-white min-h-screen relative selection:bg-gold selection:text-black flex flex-col justify-center">
 
-    <!-- خلفية المطعم الفاخرة (تم حل مشكلة الاهتزاز باستخدام fixed top-0 left-0 w-full h-full) -->
-    <div class="fixed top-0 left-0 w-full h-full z-0 pointer-events-none">
-        <img id="bgImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=700&auto=format&fit=crop" alt="Restaurant Background" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black/60"></div>
+    <!-- حل مشكلة اهتزاز الخلفية (Jitter Fix) -->
+    <div class="fixed top-0 left-0 right-0 bottom-0 z-0 pointer-events-none bg-black">
+        <img id="bgImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=700&auto=format&fit=crop" alt="Background" class="w-full h-full object-cover opacity-60">
     </div>
 
     <!-- 1. شاشة التحميل -->
@@ -66,7 +68,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة بيانات الدخول (تم حل مشكلة خروج الإيميل باستخدام break-all) -->
+    <!-- 3. شاشة بيانات الدخول -->
     <div id="credentialsView" class="hidden relative z-10 max-w-md mx-auto px-5 w-full">
         <div class="glass-panel rounded-[2rem] p-8 text-center border-green-500/50">
             <i class="ph-fill ph-check-circle text-5xl text-green-400 mb-4"></i>
@@ -80,7 +82,7 @@
                 <p id="genPass" class="text-gold font-bold text-lg select-all break-all"></p>
             </div>
             
-            <a href="login.html" class="block w-full py-4 bg-white/10 text-white border border-white/20 font-bold rounded-xl hover:bg-white/20 transition-all">
+            <a href="admin.html" class="block w-full py-4 bg-white/10 text-white border border-white/20 font-bold rounded-xl hover:bg-white/20 transition-all">
                 الذهاب للوحة التحكم
             </a>
         </div>
@@ -105,7 +107,7 @@
                             <div class="p-2.5 bg-gold/10 rounded-xl text-gold group-hover:bg-gold group-hover:text-black transition-colors"><i class="ph ph-book-open-text text-2xl"></i></div>
                             <span class="font-bold text-lg tracking-wide text-white">قائمة الطعام</span>
                         </div>
-                        <i id="menuIcon" class="ph ph-caret-down text-gray-400 transition-transform duration-300"></i>
+                        <i id="menuIcon" class="ph ph-caret-down text-gray-400 transition-transform duration-200"></i>
                     </button>
                     <div id="menuWrapper" class="menu-wrapper">
                         <div id="menuImagesContainer" class="menu-scroll-container pb-2"></div>
@@ -257,7 +259,6 @@
             document.getElementById('callBtn').href = `tel:${data.phone || dummyData.phone}`;
             document.getElementById('reviewBtn').href = data.googleReviewUrl || dummyData.googleReviewUrl;
             
-            // تغيير الخلفية
             if(data.bgImage) {
                 document.getElementById('bgImage').src = data.bgImage;
             }
