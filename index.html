@@ -19,29 +19,86 @@
         }
     </script>
     <style>
-        body { -webkit-tap-highlight-color: transparent; background-color: #050505; }
-        .glass-panel { background: rgba(20, 20, 20, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-        .glass-button { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
-        .glass-button:active { transform: scale(0.97); background: rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.5); }
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            background-color: #050505; 
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        /* حل مشكلة اهتزاز الخلفية والمساحة السوداء عند السحب */
+        .bg-fixed-container {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            height: 110lvh;
+            z-index: 0;
+            pointer-events: none;
+            transform: translateZ(0);
+            will-change: transform;
+        }
+
+        .glass-panel { 
+            background: rgba(20, 20, 20, 0.75); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(212, 175, 55, 0.15); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
+        }
+
+        .glass-button { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            transition: all 0.2s ease; 
+        }
+        .glass-button:active { 
+            transform: scale(0.97); 
+            background: rgba(212, 175, 55, 0.1); 
+            border-color: rgba(212, 175, 55, 0.5); 
+        }
         
-        /* تسريع حركة المنيو إلى 0.2s */
-        .menu-wrapper { transition: max-height 0.2s ease-in-out, opacity 0.2s ease-in-out, padding 0.2s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
-        .menu-wrapper.open { max-height: 450px; opacity: 1; padding-top: 1rem; }
+        /* حل بطء وهزة المنيو - فتح فوري بـ Hardware Acceleration */
+        .menu-wrapper { 
+            display: none; 
+            padding-top: 1rem;
+        }
+        .menu-wrapper.open { 
+            display: block; 
+            animation: slideSmooth 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideSmooth {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
-        .menu-scroll-container { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 4px; }
+        .menu-scroll-container { 
+            max-height: 380px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.85rem; 
+            padding-right: 4px; 
+            -webkit-overflow-scrolling: touch;
+        }
         .menu-scroll-container::-webkit-scrollbar { width: 4px; }
         .menu-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
         .menu-scroll-container::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.5); border-radius: 10px; }
         body::-webkit-scrollbar { display: none; }
+
         .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; }
         .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
     </style>
 </head>
 <body class="antialiased text-white min-h-screen relative selection:bg-gold selection:text-black flex flex-col justify-center">
 
-    <!-- حل مشكلة اهتزاز الخلفية (Jitter Fix) -->
-    <div class="fixed top-0 left-0 right-0 bottom-0 z-0 pointer-events-none bg-black">
-        <img id="bgImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=700&auto=format&fit=crop" alt="Background" class="w-full h-full object-cover opacity-60">
+    <!-- طبقة الخلفية المتقنة الثابتة 100% -->
+    <div class="bg-fixed-container">
+        <img id="bgImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" alt="Restaurant Background" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
     <!-- 1. شاشة التحميل -->
@@ -89,7 +146,7 @@
     </div>
 
     <!-- 4. واجهة المطعم الفاخرة -->
-    <div id="publicView" class="hidden relative z-10 max-w-md mx-auto min-h-screen flex-col justify-center px-5 py-20 w-full">
+    <div id="publicView" class="hidden relative z-10 max-w-md mx-auto min-h-screen flex-col justify-center px-5 py-16 w-full">
         <div class="glass-panel rounded-[2rem] px-6 pb-8 pt-16 relative mt-10">
             <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 z-20">
                 <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gold via-yellow-200 to-gold shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
@@ -136,10 +193,10 @@
     </div>
 
     <!-- Lightbox -->
-    <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-200">
         <button onclick="closeLightbox()" class="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center text-white transition-all transform hover:scale-105 active:scale-95 z-[110]"><i class="ph-bold ph-x text-xl"></i></button>
         <div class="w-full h-full flex items-center justify-center p-4">
-            <img id="lightboxImage" src="" alt="Menu Fullscreen" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-transform duration-300 scale-95">
+            <img id="lightboxImage" src="" alt="Menu Fullscreen" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-transform duration-200 scale-95">
         </div>
     </div>
 
@@ -166,13 +223,13 @@
         const dummyData = {
             name: "لا بيرجولا | La Pergola",
             description: "نأخذك في رحلة تذوق استثنائية. حيث تلتقي المكونات الطازجة مع الإبداع في أجواء تسحر الحواس.",
-            logo: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=700&auto=format&fit=crop",
-            bgImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=700&auto=format&fit=crop",
+            logo: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=600&auto=format&fit=crop",
+            bgImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop",
             phone: "+971501234567",
             googleReviewUrl: "#review",
             menuImages: [
-                "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=700&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=700&auto=format&fit=crop"
+                "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=600&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600&auto=format&fit=crop"
             ],
             socials: { instagram: "https://instagram.com", whatsapp: "https://wa.me/971501234567", facebook: "https://facebook.com" }
         };
@@ -299,7 +356,7 @@
             const lb = document.getElementById('lightbox');
             const img = document.getElementById('lightboxImage');
             lb.classList.add('opacity-0'); img.classList.remove('scale-100'); img.classList.add('scale-95');
-            setTimeout(() => { lb.classList.add('hidden'); lb.classList.remove('flex'); document.body.style.overflow = ''; }, 300);
+            setTimeout(() => { lb.classList.add('hidden'); lb.classList.remove('flex'); document.body.style.overflow = ''; }, 200);
         }
 
         init();
