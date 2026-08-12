@@ -1,8 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/p/:code",
-      "destination": "/api/share?p=:code"
-    }
-  ]
+  "cleanUrls": true,
+  "trailingSlash": false
 }
