@@ -36,9 +36,9 @@
 </head>
 <body class="antialiased text-white min-h-screen relative selection:bg-gold selection:text-black flex flex-col justify-center">
 
-    <!-- خلفية المطعم الفاخرة -->
-    <div class="fixed inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1920&auto=format&fit=crop" alt="Restaurant Background" class="w-full h-full object-cover">
+    <!-- خلفية المطعم الفاخرة (تم حل مشكلة الاهتزاز باستخدام fixed top-0 left-0 w-full h-full) -->
+    <div class="fixed top-0 left-0 w-full h-full z-0 pointer-events-none">
+        <img id="bgImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=700&auto=format&fit=crop" alt="Restaurant Background" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
@@ -66,7 +66,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة بيانات الدخول -->
+    <!-- 3. شاشة بيانات الدخول (تم حل مشكلة خروج الإيميل باستخدام break-all) -->
     <div id="credentialsView" class="hidden relative z-10 max-w-md mx-auto px-5 w-full">
         <div class="glass-panel rounded-[2rem] p-8 text-center border-green-500/50">
             <i class="ph-fill ph-check-circle text-5xl text-green-400 mb-4"></i>
@@ -75,9 +75,9 @@
             
             <div class="bg-black/50 p-5 rounded-xl mb-6 text-left dir-ltr border border-white/10">
                 <p class="text-gray-400 text-sm mb-1">Email:</p>
-                <p id="genEmail" class="text-gold font-bold text-lg mb-4 select-all"></p>
+                <p id="genEmail" class="text-gold font-bold text-lg mb-4 select-all break-all"></p>
                 <p class="text-gray-400 text-sm mb-1">Password:</p>
-                <p id="genPass" class="text-gold font-bold text-lg select-all"></p>
+                <p id="genPass" class="text-gold font-bold text-lg select-all break-all"></p>
             </div>
             
             <a href="login.html" class="block w-full py-4 bg-white/10 text-white border border-white/20 font-bold rounded-xl hover:bg-white/20 transition-all">
@@ -91,7 +91,7 @@
         <div class="glass-panel rounded-[2rem] px-6 pb-8 pt-16 relative mt-10">
             <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 z-20">
                 <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gold via-yellow-200 to-gold shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                    <img id="logoImage" src="" alt="Logo" class="w-full h-full rounded-full object-cover border-4 border-[#141414]">
+                    <img id="logoImage" src="" alt="Logo" loading="lazy" class="w-full h-full rounded-full object-cover border-4 border-[#141414]">
                 </div>
             </div>
             <div class="text-center mb-8 relative z-10 mt-2">
@@ -164,12 +164,13 @@
         const dummyData = {
             name: "لا بيرجولا | La Pergola",
             description: "نأخذك في رحلة تذوق استثنائية. حيث تلتقي المكونات الطازجة مع الإبداع في أجواء تسحر الحواس.",
-            logo: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=300&auto=format&fit=crop",
+            logo: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=700&auto=format&fit=crop",
+            bgImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=700&auto=format&fit=crop",
             phone: "+971501234567",
             googleReviewUrl: "#review",
             menuImages: [
-                "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=600&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600&auto=format&fit=crop"
+                "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=700&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=700&auto=format&fit=crop"
             ],
             socials: { instagram: "https://instagram.com", whatsapp: "https://wa.me/971501234567", facebook: "https://facebook.com" }
         };
@@ -224,7 +225,7 @@
 
                 await setDoc(doc(db, "restaurants", uid), {
                     name: name, phone: phone, description: "مرحباً بكم في مطعمنا.",
-                    logo: dummyData.logo, menuImages: [], socials: {}, googleReviewUrl: "",
+                    logo: dummyData.logo, bgImage: dummyData.bgImage, menuImages: [], socials: {}, googleReviewUrl: "",
                     cardId: cardId, stats: { views: 0, menu: 0, calls: 0, reviews: 0 }
                 });
 
@@ -235,7 +236,6 @@
                 document.getElementById('genEmail').innerText = email;
                 document.getElementById('genPass').innerText = password;
             } catch (e) {
-                // معالجة خطأ تكرار رقم الهاتف
                 if (e.code === 'auth/email-already-in-use') {
                     alert("هذا الرقم مسجل بالفعل لمطعم آخر. الرجاء استخدام رقم هاتف مختلف.");
                 } else {
@@ -256,6 +256,11 @@
             document.getElementById('logoImage').src = data.logo || dummyData.logo;
             document.getElementById('callBtn').href = `tel:${data.phone || dummyData.phone}`;
             document.getElementById('reviewBtn').href = data.googleReviewUrl || dummyData.googleReviewUrl;
+            
+            // تغيير الخلفية
+            if(data.bgImage) {
+                document.getElementById('bgImage').src = data.bgImage;
+            }
 
             const menuContainer = document.getElementById('menuImagesContainer');
             menuContainer.innerHTML = '';
