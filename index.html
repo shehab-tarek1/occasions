@@ -30,8 +30,6 @@
         .menu-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
         .menu-scroll-container::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.5); border-radius: 10px; }
         body::-webkit-scrollbar { display: none; }
-        
-        /* كلاس إضافي لحقول الإدخال في شاشة الإعداد */
         .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; }
         .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
     </style>
@@ -50,7 +48,7 @@
         <p class="text-gold font-bold tracking-widest">جاري تهيئة التجربة...</p>
     </div>
 
-    <!-- 2. شاشة إعداد الكارت لأول مرة (تظهر فقط للكروت الجديدة) -->
+    <!-- 2. شاشة إعداد الكارت لأول مرة -->
     <div id="setupView" class="hidden relative z-10 max-w-md mx-auto px-5 w-full">
         <div class="glass-panel rounded-[2rem] p-8 text-center">
             <div class="w-16 h-16 mx-auto bg-gold/20 rounded-full flex items-center justify-center text-gold mb-4">
@@ -68,7 +66,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة بيانات الدخول (تظهر لمرة واحدة) -->
+    <!-- 3. شاشة بيانات الدخول -->
     <div id="credentialsView" class="hidden relative z-10 max-w-md mx-auto px-5 w-full">
         <div class="glass-panel rounded-[2rem] p-8 text-center border-green-500/50">
             <i class="ph-fill ph-check-circle text-5xl text-green-400 mb-4"></i>
@@ -88,7 +86,7 @@
         </div>
     </div>
 
-    <!-- 4. واجهة المطعم الفاخرة (التصميم الأصلي الخاص بك) -->
+    <!-- 4. واجهة المطعم الفاخرة -->
     <div id="publicView" class="hidden relative z-10 max-w-md mx-auto min-h-screen flex-col justify-center px-5 py-20 w-full">
         <div class="glass-panel rounded-[2rem] px-6 pb-8 pt-16 relative mt-10">
             <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 z-20">
@@ -163,7 +161,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // البيانات التجريبية (Fallback)
         const dummyData = {
             name: "لا بيرجولا | La Pergola",
             description: "نأخذك في رحلة تذوق استثنائية. حيث تلتقي المكونات الطازجة مع الإبداع في أجواء تسحر الحواس.",
@@ -238,7 +235,12 @@
                 document.getElementById('genEmail').innerText = email;
                 document.getElementById('genPass').innerText = password;
             } catch (e) {
-                alert("خطأ: " + e.message);
+                // معالجة خطأ تكرار رقم الهاتف
+                if (e.code === 'auth/email-already-in-use') {
+                    alert("هذا الرقم مسجل بالفعل لمطعم آخر. الرجاء استخدام رقم هاتف مختلف.");
+                } else {
+                    alert("حدث خطأ: " + e.message);
+                }
                 btn.innerText = "حفظ وتفعيل الكارت";
             }
         }
@@ -247,7 +249,7 @@
             document.getElementById('loaderView').classList.add('hidden');
             const publicView = document.getElementById('publicView');
             publicView.classList.remove('hidden');
-            publicView.classList.add('flex'); // للحفاظ على التوسيط
+            publicView.classList.add('flex'); 
             
             document.getElementById('restaurantName').textContent = data.name || dummyData.name;
             document.getElementById('restaurantDesc').textContent = data.description || dummyData.description;
@@ -273,7 +275,6 @@
             if(socials.facebook) { document.getElementById('fbBtn').href = socials.facebook; document.getElementById('fbBtn').classList.remove('hidden'); }
         }
 
-        // UI Functions
         window.toggleMenu = function() {
             const wrapper = document.getElementById('menuWrapper');
             const icon = document.getElementById('menuIcon');
