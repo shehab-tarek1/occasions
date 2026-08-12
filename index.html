@@ -89,7 +89,7 @@
         .menu-scroll-container::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.5); border-radius: 10px; }
         body::-webkit-scrollbar { display: none; }
 
-        .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; }
+        .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; padding: 0.85rem 1rem; font-size: 0.95rem; }
         .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
     </style>
 </head>
@@ -98,7 +98,7 @@
     <!-- طبقة الخلفية المتقنة الثابتة 100% -->
     <div class="bg-fixed-container">
         <img id="bgImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" alt="Restaurant Background" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="absolute inset-0 bg-black/30"></div>
     </div>
 
     <!-- 1. شاشة التحميل -->
@@ -116,8 +116,7 @@
             <h2 class="text-2xl font-bold text-white mb-2">تفعيل الكارت الذكي</h2>
             <p class="text-sm text-gray-300 mb-8">أدخل بيانات مطعمك الأساسية للبدء.</p>
             
-            <input type="text" id="setupName" placeholder="اسم المطعم" class="luxury-input w-full p-4 mb-4 text-center">
-            <input type="tel" id="setupPhone" placeholder="رقم الهاتف (مثال: 01206244875)" class="luxury-input w-full p-4 mb-6 text-center" dir="ltr">
+            <div class="absolute inset-0 bg-black/60"></div>
             
             <button onclick="activateCard()" id="activateBtn" class="w-full py-4 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold text-lg rounded-xl shadow-[0_10px_30px_rgba(212,175,55,0.4)] transition-all active:scale-95">
                 حفظ وتفعيل الكارت
