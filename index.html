@@ -2,41 +2,145 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>NFC Smart Card</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NFC VIP Restaurant Card</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ضع كود الحماية هنا -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    colors: { gold: '#D4AF37', 'gold-light': '#F3E5AB' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; background-color: #050505; }
+        .glass-panel { background: rgba(20, 20, 20, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+        .glass-button { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .glass-button:active { transform: scale(0.97); background: rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.5); }
+        .menu-wrapper { transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .menu-wrapper.open { max-height: 450px; opacity: 1; padding-top: 1rem; }
+        .menu-scroll-container { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 4px; }
+        .menu-scroll-container::-webkit-scrollbar { width: 4px; }
+        .menu-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .menu-scroll-container::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.5); border-radius: 10px; }
+        body::-webkit-scrollbar { display: none; }
+        
+        /* كلاس إضافي لحقول الإدخال في شاشة الإعداد */
+        .luxury-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 1rem; transition: all 0.3s; }
+        .luxury-input:focus { border-color: #D4AF37; background: rgba(212,175,55,0.05); outline: none; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
+    </style>
 </head>
-<body class="bg-[#050505] text-white min-h-screen flex items-center justify-center">
+<body class="antialiased text-white min-h-screen relative selection:bg-gold selection:text-black flex flex-col justify-center">
 
-    <!-- شاشة التحميل -->
-    <div id="loader" class="text-gold text-2xl">جاري قراءة الكارت...</div>
-
-    <!-- 1. نموذج إعداد المطعم (يظهر لأول مرة فقط) -->
-    <div id="setupForm" class="hidden w-full max-w-md p-8 bg-gray-900 rounded-2xl">
-        <h2 class="text-2xl font-bold text-gold mb-4">إعداد الكارت الجديد</h2>
-        <p class="text-sm text-gray-400 mb-6">أدخل بيانات مطعمك الأساسية لتفعيل الكارت.</p>
-        
-        <input type="text" id="restName" placeholder="اسم المطعم" class="w-full p-3 mb-4 bg-black border border-gray-700 rounded text-white">
-        <input type="tel" id="restPhone" placeholder="رقم الهاتف (مثال: 01206244875)" class="w-full p-3 mb-4 bg-black border border-gray-700 rounded text-white">
-        
-        <button onclick="setupNewCard()" class="w-full p-3 bg-yellow-600 text-black font-bold rounded">حفظ وتفعيل الكارت</button>
+    <!-- خلفية المطعم الفاخرة -->
+    <div class="fixed inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1920&auto=format&fit=crop" alt="Restaurant Background" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
-    <!-- 2. بطاقة بيانات الدخول (تظهر لمرة واحدة بعد الحفظ) -->
-    <div id="credentialsCard" class="hidden w-full max-w-md p-8 bg-green-900/20 border border-green-500 rounded-2xl text-center">
-        <h2 class="text-2xl font-bold text-green-400 mb-4">تم التفعيل بنجاح! 🎉</h2>
-        <p class="text-sm text-gray-300 mb-4">الرجاء تصوير هذه الشاشة، لن تظهر مرة أخرى.</p>
-        <div class="bg-black p-4 rounded mb-4 text-left dir-ltr">
-            <p class="text-gray-400">Email: <span id="genEmail" class="text-white font-bold"></span></p>
-            <p class="text-gray-400">Password: <span id="genPass" class="text-white font-bold"></span></p>
+    <!-- 1. شاشة التحميل -->
+    <div id="loaderView" class="relative z-50 flex flex-col items-center justify-center w-full">
+        <div class="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-gold font-bold tracking-widest">جاري تهيئة التجربة...</p>
+    </div>
+
+    <!-- 2. شاشة إعداد الكارت لأول مرة (تظهر فقط للكروت الجديدة) -->
+    <div id="setupView" class="hidden relative z-10 max-w-md mx-auto px-5 w-full">
+        <div class="glass-panel rounded-[2rem] p-8 text-center">
+            <div class="w-16 h-16 mx-auto bg-gold/20 rounded-full flex items-center justify-center text-gold mb-4">
+                <i class="ph-bold ph-magic-wand text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">تفعيل الكارت الذكي</h2>
+            <p class="text-sm text-gray-300 mb-8">أدخل بيانات مطعمك الأساسية للبدء.</p>
+            
+            <input type="text" id="setupName" placeholder="اسم المطعم" class="luxury-input w-full p-4 mb-4 text-center">
+            <input type="tel" id="setupPhone" placeholder="رقم الهاتف (مثال: 01206244875)" class="luxury-input w-full p-4 mb-6 text-center" dir="ltr">
+            
+            <button onclick="activateCard()" id="activateBtn" class="w-full py-4 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold text-lg rounded-xl shadow-[0_10px_30px_rgba(212,175,55,0.4)] transition-all active:scale-95">
+                حفظ وتفعيل الكارت
+            </button>
         </div>
-        <a href="login.html" class="block w-full p-3 bg-green-600 text-white font-bold rounded">الذهاب للوحة التحكم</a>
     </div>
 
-    <!-- 3. واجهة المطعم الفاخرة (تم إخفاء زر الإدارة منها) -->
-    <div id="publicView" class="hidden w-full">
-        <!-- ضع هنا كود الـ HTML الخاص بواجهة المطعم الفاخرة التي صممناها سابقاً -->
-        <!-- ملاحظة: لا تضع زر الإدارة (الترس) هنا أبداً -->
+    <!-- 3. شاشة بيانات الدخول (تظهر لمرة واحدة) -->
+    <div id="credentialsView" class="hidden relative z-10 max-w-md mx-auto px-5 w-full">
+        <div class="glass-panel rounded-[2rem] p-8 text-center border-green-500/50">
+            <i class="ph-fill ph-check-circle text-5xl text-green-400 mb-4"></i>
+            <h2 class="text-2xl font-bold text-white mb-2">تم التفعيل بنجاح!</h2>
+            <p class="text-sm text-red-400 mb-6 font-bold">الرجاء تصوير هذه الشاشة، لن تظهر مرة أخرى.</p>
+            
+            <div class="bg-black/50 p-5 rounded-xl mb-6 text-left dir-ltr border border-white/10">
+                <p class="text-gray-400 text-sm mb-1">Email:</p>
+                <p id="genEmail" class="text-gold font-bold text-lg mb-4 select-all"></p>
+                <p class="text-gray-400 text-sm mb-1">Password:</p>
+                <p id="genPass" class="text-gold font-bold text-lg select-all"></p>
+            </div>
+            
+            <a href="login.html" class="block w-full py-4 bg-white/10 text-white border border-white/20 font-bold rounded-xl hover:bg-white/20 transition-all">
+                الذهاب للوحة التحكم
+            </a>
+        </div>
+    </div>
+
+    <!-- 4. واجهة المطعم الفاخرة (التصميم الأصلي الخاص بك) -->
+    <div id="publicView" class="hidden relative z-10 max-w-md mx-auto min-h-screen flex-col justify-center px-5 py-20 w-full">
+        <div class="glass-panel rounded-[2rem] px-6 pb-8 pt-16 relative mt-10">
+            <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 z-20">
+                <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gold via-yellow-200 to-gold shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                    <img id="logoImage" src="" alt="Logo" class="w-full h-full rounded-full object-cover border-4 border-[#141414]">
+                </div>
+            </div>
+            <div class="text-center mb-8 relative z-10 mt-2">
+                <h1 id="restaurantName" class="text-3xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-gold-light via-gold to-yellow-600 mb-2"></h1>
+                <p id="restaurantDesc" class="text-gray-300 text-sm leading-relaxed font-light px-2"></p>
+            </div>
+            <div class="space-y-4 relative z-10">
+                <div>
+                    <button onclick="toggleMenu()" class="glass-button w-full rounded-2xl p-4 flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <div class="p-2.5 bg-gold/10 rounded-xl text-gold group-hover:bg-gold group-hover:text-black transition-colors"><i class="ph ph-book-open-text text-2xl"></i></div>
+                            <span class="font-bold text-lg tracking-wide text-white">قائمة الطعام</span>
+                        </div>
+                        <i id="menuIcon" class="ph ph-caret-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="menuWrapper" class="menu-wrapper">
+                        <div id="menuImagesContainer" class="menu-scroll-container pb-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="#" id="callBtn" class="glass-button flex flex-col items-center justify-center p-5 rounded-2xl">
+                        <div class="p-3 bg-white/5 rounded-full mb-3 text-white"><i class="ph-light ph-phone-call text-3xl"></i></div>
+                        <span class="font-medium text-sm tracking-wider text-white">احجز طاولتك</span>
+                    </a>
+                    <a href="#" id="reviewBtn" class="glass-button flex flex-col items-center justify-center p-5 rounded-2xl">
+                        <div class="p-3 bg-white/5 rounded-full mb-3 text-gold"><i class="ph-light ph-star text-3xl"></i></div>
+                        <span class="font-medium text-sm tracking-wider text-white">قيّمنا</span>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-white/10">
+                <p class="text-center text-xs text-gray-400 mb-4 tracking-widest">تواصل معنا</p>
+                <div class="flex justify-center gap-6">
+                    <a href="#" id="waBtn" class="p-3.5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-[#25D366] hover:border-[#25D366] transition-all hidden"><i class="ph-fill ph-whatsapp-logo text-2xl"></i></a>
+                    <a href="#" id="igBtn" class="p-3.5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-[#E1306C] hover:border-[#E1306C] transition-all hidden"><i class="ph-fill ph-instagram-logo text-2xl"></i></a>
+                    <a href="#" id="fbBtn" class="p-3.5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-[#1877F2] hover:border-[#1877F2] transition-all hidden"><i class="ph-fill ph-facebook-logo text-2xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center text-white transition-all transform hover:scale-105 active:scale-95 z-[110]"><i class="ph-bold ph-x text-xl"></i></button>
+        <div class="w-full h-full flex items-center justify-center p-4">
+            <img id="lightboxImage" src="" alt="Menu Fullscreen" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-transform duration-300 scale-95">
+        </div>
     </div>
 
     <!-- Firebase Logic -->
@@ -52,88 +156,146 @@
             projectId: "ma-smart-promo",
             storageBucket: "ma-smart-promo.firebasestorage.app",
             messagingSenderId: "389479043172",
-            appId: "1:389479043172:web:02205a57410972ffc9cf71",
-            measurementId: "G-QF6BXWELBX"
+            appId: "1:389479043172:web:02205a57410972ffc9cf71"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // استخراج ID الكارت من الرابط (مثال: ?card=12345)
+        // البيانات التجريبية (Fallback)
+        const dummyData = {
+            name: "لا بيرجولا | La Pergola",
+            description: "نأخذك في رحلة تذوق استثنائية. حيث تلتقي المكونات الطازجة مع الإبداع في أجواء تسحر الحواس.",
+            logo: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=300&auto=format&fit=crop",
+            phone: "+971501234567",
+            googleReviewUrl: "#review",
+            menuImages: [
+                "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=600&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600&auto=format&fit=crop"
+            ],
+            socials: { instagram: "https://instagram.com", whatsapp: "https://wa.me/971501234567", facebook: "https://facebook.com" }
+        };
+
         const urlParams = new URLSearchParams(window.location.search);
         const cardId = urlParams.get('card');
 
-        async function checkCard() {
-            if(!cardId) return alert("رابط غير صالح");
-            
-            const cardRef = doc(db, "cards", cardId);
-            const cardSnap = await getDoc(cardRef);
-
-            document.getElementById('loader').classList.add('hidden');
-
-            if (cardSnap.exists()) {
-                const cardData = cardSnap.data();
-                if (cardData.status === 'pending') {
-                    // الكارت جديد -> إظهار نموذج الإعداد
-                    document.getElementById('setupForm').classList.remove('hidden');
+        async function init() {
+            if(!cardId) {
+                renderPublicView(dummyData);
+                return;
+            }
+            try {
+                const cardSnap = await getDoc(doc(db, "cards", cardId));
+                if (cardSnap.exists()) {
+                    const cardData = cardSnap.data();
+                    if (cardData.status === 'pending') {
+                        document.getElementById('loaderView').classList.add('hidden');
+                        document.getElementById('setupView').classList.remove('hidden');
+                    } else {
+                        const restSnap = await getDoc(doc(db, "restaurants", cardData.ownerId));
+                        if(restSnap.exists()) {
+                            renderPublicView(restSnap.data());
+                        } else {
+                            renderPublicView(dummyData);
+                        }
+                    }
                 } else {
-                    // الكارت مفعل -> جلب بيانات المطعم وعرض الواجهة الفاخرة
-                    fetchAndShowRestaurant(cardData.ownerId);
+                    alert("هذا الكارت غير مسجل في النظام");
+                    renderPublicView(dummyData);
                 }
-            } else {
-                alert("هذا الكارت غير مسجل في النظام");
+            } catch(e) {
+                console.error(e);
+                renderPublicView(dummyData);
             }
         }
 
-        window.setupNewCard = async function() {
-            const name = document.getElementById('restName').value;
-            const phone = document.getElementById('restPhone').value;
+        window.activateCard = async function() {
+            const name = document.getElementById('setupName').value;
+            const phone = document.getElementById('setupPhone').value;
+            const btn = document.getElementById('activateBtn');
             
-            if(!name || !phone) return alert("أكمل البيانات");
+            if(!name || !phone) return alert("الرجاء إكمال البيانات");
+            btn.innerText = "جاري التفعيل...";
 
-            // توليد إيميل وباسورد
             const email = `${phone}@am.smart.promo.com`;
-            const password = Math.floor(10000000 + Math.random() * 90000000).toString(); // 8 أرقام عشوائية
+            const password = Math.floor(10000000 + Math.random() * 90000000).toString();
 
             try {
-                // 1. إنشاء الحساب
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const uid = userCredential.user.uid;
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                const uid = userCred.user.uid;
 
-                // 2. حفظ بيانات المطعم
                 await setDoc(doc(db, "restaurants", uid), {
-                    name: name,
-                    phone: phone,
-                    cardId: cardId,
-                    createdAt: new Date()
+                    name: name, phone: phone, description: "مرحباً بكم في مطعمنا.",
+                    logo: dummyData.logo, menuImages: [], socials: {}, googleReviewUrl: "",
+                    cardId: cardId, stats: { views: 0, menu: 0, calls: 0, reviews: 0 }
                 });
 
-                // 3. تحديث حالة الكارت
-                await updateDoc(doc(db, "cards", cardId), {
-                    status: 'active',
-                    ownerId: uid
-                });
+                await updateDoc(doc(db, "cards", cardId), { status: 'active', ownerId: uid });
 
-                // 4. إظهار بيانات الدخول
-                document.getElementById('setupForm').classList.add('hidden');
-                document.getElementById('credentialsCard').classList.remove('hidden');
-                
+                document.getElementById('setupView').classList.add('hidden');
+                document.getElementById('credentialsView').classList.remove('hidden');
                 document.getElementById('genEmail').innerText = email;
                 document.getElementById('genPass').innerText = password;
-
-            } catch (error) {
-                alert("حدث خطأ: " + error.message);
+            } catch (e) {
+                alert("خطأ: " + e.message);
+                btn.innerText = "حفظ وتفعيل الكارت";
             }
         }
 
-        async function fetchAndShowRestaurant(uid) {
-            // هنا تقوم بجلب بيانات المطعم من Firestore وحقنها في الـ HTML الفاخر
-            document.getElementById('publicView').classList.remove('hidden');
-            // ... كود حقن البيانات الذي كتبناه سابقاً ...
+        function renderPublicView(data) {
+            document.getElementById('loaderView').classList.add('hidden');
+            const publicView = document.getElementById('publicView');
+            publicView.classList.remove('hidden');
+            publicView.classList.add('flex'); // للحفاظ على التوسيط
+            
+            document.getElementById('restaurantName').textContent = data.name || dummyData.name;
+            document.getElementById('restaurantDesc').textContent = data.description || dummyData.description;
+            document.getElementById('logoImage').src = data.logo || dummyData.logo;
+            document.getElementById('callBtn').href = `tel:${data.phone || dummyData.phone}`;
+            document.getElementById('reviewBtn').href = data.googleReviewUrl || dummyData.googleReviewUrl;
+
+            const menuContainer = document.getElementById('menuImagesContainer');
+            menuContainer.innerHTML = '';
+            const images = (data.menuImages && data.menuImages.length > 0) ? data.menuImages : dummyData.menuImages;
+            images.forEach((src, index) => {
+                if(!src) return;
+                const img = document.createElement('img');
+                img.src = src; img.loading = "lazy"; img.alt = `Menu Page ${index + 1}`;
+                img.className = "w-full rounded-2xl border border-white/10 shadow-lg cursor-pointer transition-all hover:border-gold hover:opacity-90 active:scale-[0.98]";
+                img.onclick = () => openLightbox(src);
+                menuContainer.appendChild(img);
+            });
+
+            const socials = data.socials || dummyData.socials;
+            if(socials.whatsapp) { document.getElementById('waBtn').href = socials.whatsapp; document.getElementById('waBtn').classList.remove('hidden'); }
+            if(socials.instagram) { document.getElementById('igBtn').href = socials.instagram; document.getElementById('igBtn').classList.remove('hidden'); }
+            if(socials.facebook) { document.getElementById('fbBtn').href = socials.facebook; document.getElementById('fbBtn').classList.remove('hidden'); }
         }
 
-        checkCard();
+        // UI Functions
+        window.toggleMenu = function() {
+            const wrapper = document.getElementById('menuWrapper');
+            const icon = document.getElementById('menuIcon');
+            wrapper.classList.toggle('open');
+            icon.classList.toggle('rotate-180');
+            icon.classList.toggle('text-gold');
+        }
+        window.openLightbox = function(src) {
+            const lb = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImage');
+            img.src = src; lb.classList.remove('hidden'); lb.classList.add('flex');
+            setTimeout(() => { lb.classList.remove('opacity-0'); img.classList.remove('scale-95'); img.classList.add('scale-100'); }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+        window.closeLightbox = function() {
+            const lb = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImage');
+            lb.classList.add('opacity-0'); img.classList.remove('scale-100'); img.classList.add('scale-95');
+            setTimeout(() => { lb.classList.add('hidden'); lb.classList.remove('flex'); document.body.style.overflow = ''; }, 300);
+        }
+
+        init();
     </script>
 </body>
 </html>
